@@ -1,0 +1,12 @@
+[ignore]
+./dist/.*
+./coverage/.*
+./node_modules/.*
+.*/__mocks__/.*
+.*/__tests__/.*
+
+[options]
+module.use_strict=true
+
+[version]
+^0.26.0

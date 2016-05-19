@@ -1,0 +1,86 @@
+{
+  "name": "wat-json",
+  "version": "0.0.1",
+  "description": "A library to convert general javascript objects to JSON objects and vice versa.",
+  "main": "watJSON.min.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "node ./node_modules/gulp-cli/bin/gulp.js",
+    "build-browser": "node ./node_modules/gulp-cli/bin/gulp.js browser:build:min",
+    "flow": "flow",
+    "lint": "node ./node_modules/eslint-cli/bin/eslint.js src",
+    "test": "node ./node_modules/jest-cli/bin/jest.js",
+    "coverage": "node ./node_modules/jest-cli/bin/jest.js --coverage",
+    "test-debug": "node debug --harmony ./node_modules/jest-cli/bin/jest.js --runInBand",
+    "test-debug-inspector": "node-debug --nodejs --harmony ./node_modules/jest-cli/bin/jest.js --runInBand"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://git.web-uhee.com/lib/watJSON"
+  },
+  "keywords": [
+    "json"
+  ],
+  "author": "Jae-Yeop Kim (kseo05com@gmail.com)",
+  "license": "MIT",
+  "tags": [
+    "json"
+  ],
+  "files": [
+    "README.md",
+    "dist/watJSON.min.js"
+  ],
+  "devEngines": {
+    "node": "6.x",
+    "npm": "3.x"
+  },
+  "devDependencies": {
+    "acorn": "^3.2.0",
+    "babel-cli": "^6.8.0",
+    "babel-core": "^6.9.0",
+    "babel-eslint": "^6.1.0",
+    "babel-jest": "^12.1.0",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-flow-strip-types": "^6.8.0",
+    "babel-plugin-typecheck": "^3.9.0",
+    "babel-polyfill": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "del": "^2.2.0",
+    "escodegen": "^1.8.0",
+    "eslint": "^2.10.2",
+    "eslint-cli": "^1.1.0",
+    "eslint-loader": "^1.3.0",
+    "eslint-plugin-flowtype": "^2.3.0",
+    "flow-bin": "^0.26.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-cli": "^1.2.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-jsdoc-to-markdown": "^1.2.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-shell": "^0.5.2",
+    "imports-loader": "^0.6.5",
+    "jest-cli": "^12.1.0",
+    "jquery": "^2.2.4",
+    "jsdom": "^9.3.0",
+    "json-loader": "^0.5.4",
+    "jsonpath": "^0.2.4",
+    "phantomjs-prebuilt": "^2.1.7",
+    "webpack": "^1.13.1"
+  },
+  "jest": {
+    "cache": true,
+    "scriptPreprocessor": "<rootDir>/scripts/jest/preprocessor.js",
+    "rootDir": "",
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
+    "testRunner": "jasmine2",
+    "unmockedModulePathPatterns": [
+      ""
+    ]
+  },
+  "private": true
+}
