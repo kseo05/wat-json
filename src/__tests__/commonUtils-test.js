@@ -36,7 +36,7 @@ describe('commonUtils.extend(target, ...sources);', () => {
   });
 });
 
-describe('utils.clone(obj);', () => {
+describe('commonUtils.clone(obj);', () => {
   var object;
 
   beforeEach(() => {
@@ -72,12 +72,25 @@ describe('utils.clone(obj);', () => {
   });
 });
 
-describe('utils.escapeJSON(str);', () => {
+describe('commonUtils.escapeJSON(str);', () => {
   var str = "\tNeque porro quisquam est qui dolorem ipsum quia \"dolor\" sit 'amet', 'consectetur', 'adipisci velit'...\n";
 
-  it('실행 시, "문자로 감쌀 수 있는 형태의 json-escaped 문자열을 반환해야 한다.', () => {
+  it('실행 시, 문자로 감쌀 수 있는 형태의 json-escaped 문자열을 반환해야 한다.', () => {
     var result = commonUtils.escapeJSON(str);
 
     expect(result).toEqual("\\tNeque porro quisquam est qui dolorem ipsum quia \\\"dolor\\\" sit 'amet', 'consectetur', 'adipisci velit'...\\n");
+  });
+});
+
+describe('commonUtils.evalInContext(code, context)', () => {
+  it('실행 시, 의도된 context 로 javascript code 가 evaluate 되어야 한다.', () => {
+    var object = (function () {
+      var Clazz = function () {
+        this.str = "Neque porro quisquam est qui dolorem ipsum quia dolor sit 'amet', 'consectetur', 'adipisci velit'...";
+      };
+      return new Clazz();
+    })();
+    object.getString = commonUtils.evalInContext('[function () { return this.str; }][0];', object);
+    expect(object.getString()).toEqual("Neque porro quisquam est qui dolorem ipsum quia dolor sit 'amet', 'consectetur', 'adipisci velit'...");
   });
 });

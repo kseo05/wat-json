@@ -166,14 +166,15 @@ Object.keys(watJSONConstants.escKeynameMap).forEach(function (key: string) {
 /* private methods - begin */
 /**
  * The main function for `watJSON.fromWatJSON(obj, opt)` and `watJson.parse(str, opt)`.
- * @param {any} obj
+ * @param  {any} obj
  * @param  {watJSON.Options} opt
+ * @param  {Object=} context
  * @return {any}
  * @static
  * @private
  * @ignore
  */
-var _fromWatJSON: Function = function (obj: any, opt: Options): any {
+var _fromWatJSON: Function = function (obj: any, opt: Options, context: Object|null): any {
   var result: any;
   var dataType: string = typeof obj;
 

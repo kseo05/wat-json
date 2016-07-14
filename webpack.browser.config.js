@@ -2,7 +2,7 @@
 
 var webpackConfig = {
   entry: {
-    watJSON: './src/watJSON.js',
+    watJSON: ['./src/watJSON.js'],
   },
   node: {
     global: true,

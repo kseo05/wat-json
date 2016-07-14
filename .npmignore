@@ -3,4 +3,4 @@ coverage
 .idea
 *.iml
 
-**/_learn_.js
+**/_learn_.*

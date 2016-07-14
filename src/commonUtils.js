@@ -6,7 +6,7 @@
  * @param  {...Object} sources sources.
  * @return {Object} extended target.
  */
-var extend = function (obj: Object): Object {
+var extend: Function = function (obj: Object): Object {
   if (!arguments.length) {
     return obj || {};
   }
@@ -30,16 +30,16 @@ var extend = function (obj: Object): Object {
  * @param  {Object} obj target
  * @return {Object} shallow-copied object.
  */
-var clone = function (obj: Object): Object {
+var clone: Function = function (obj: Object): Object {
   return extend({}, obj);
-}
+};
 
 /**
  * Get JSON-escaped string.
  * @param  {string} str string to escape.
  * @return {string} escaped string.
  */
-var escapeJSON = function (str: string): string {
+var escapeJSON: Function = function (str: string): string {
   return str
     .replace(/\\/g, '\\\\')
     .replace(/\n/g, '\\n')  // Linefeed
@@ -49,11 +49,22 @@ var escapeJSON = function (str: string): string {
     .replace(/[\b]/g, '\\b')  // Backspace
     .replace(/\f/g, '\\f')  // Formfeed
     .replace(/"/g, '\\"');  // Doucle Quote
-}
+};
 
+/**
+ * Evaluate in context.
+ * @param {string} code Javascript code to evaluate.
+ * @param {any} context
+ */
+var evalInContext: Function = function (code: string, context: any): any {
+  return (function (): any {
+    return eval(code);
+  }).call(context);
+};
 
 module.exports = {
   extend,
   clone,
   escapeJSON,
+  evalInContext,
 };

@@ -38,11 +38,16 @@ describe('watDomJSON.toJSON(obj);', () => {
       path.join(__dirname, '../../../scripts/phantomjs/test/watDomJSON-toJSON.js'),
     ];
 
-    childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
-      if (!err) {
-        done();
-      }
-    });
+    try {
+      childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
+        if (!err) {
+          done();
+        }
+      });
+    } catch (e) {
+      console.log(`e = ${e}`);
+    }
+
   }, 10000);
 
 });
@@ -90,10 +95,15 @@ describe('watDomJSON.toDOM(obj);', () => {
       path.join(__dirname, '../../../scripts/phantomjs/test/watDomJSON-toDOM.js'),
     ];
 
-    childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
-      if (!err) {
-        done();
-      }
-    });
+    try {
+      childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
+        if (!err) {
+          done();
+        }
+      });
+    } catch (e) {
+      console.log(`e = ${e}`);
+    }
+
   }, 10000);
 });
