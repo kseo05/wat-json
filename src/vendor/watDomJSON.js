@@ -1,7 +1,7 @@
 /**
  * watDomJSON.js: watDomJSON is forked from domJSON v0.1.2 for watJSON.
- * It contains several bug fixes.
- * It also supports parsing SVG Documents/Elements.
+ * It supports parsing SVG Documents.
+ * It also contains several bug fixes.
  *
  * @file
  * @module watDomJSON
@@ -557,6 +557,11 @@
 
 			//Append the children in the appropriate place
 			copy.childNodes = children;
+
+			//Append SVG Document
+			if (node.getSVGDocument) {
+				copy.svgDocument = _toJSON(node.getSVGDocument(), opts, depth + 1);
+			}
 		}
 		return copy;
 	};
