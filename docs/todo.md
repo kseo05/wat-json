@@ -1,5 +1,7 @@
 ## TODO
-* demo 구현.
+* dev-server inline html 로 사용 가능한 gulp task 추가.
+ * http://phantomjs.org/api/
+* demo 구현. (dev, basic, object-explorer 로 간소화)
  * 공용 UI - 상단에 textarea 하나, 하단에 'toWatJSON()', 'fromWatJSON()' button 1개씩.
  * model (basic)
   * global.sampleModel 에 지원하는 모든 종류의 객체가 들어가 있음.

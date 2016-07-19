@@ -26,30 +26,9 @@ describe('watDomJSON.toJSON(obj);', () => {
     // console.log(JSON.stringify(json, null, 2));
   });
 
-  it('SVG Document 가 포함된 HTML Element 를 전달인자로 실행했을 때, 기대된 형태의 JSON Object 를 반환해야 한다.', function (done) {
-    // jsdom 이 svg doucment 를 지원하지 않으므로, phantomjs 를 이용해서 테스트를 동작시킨다.
-    // 해당 phantomjs 의 경로는 /scripts/phantomjs/test/watDomJSON-toJSON.js 이다.
-    const path = require('path');
-    const childProcess = require('child_process');
-    const phantomjs = require('phantomjs-prebuilt');
-    const binPath = phantomjs.path;
-
-    var childArgs = [
-      path.join(__dirname, '../../../scripts/phantomjs/test/watDomJSON-toJSON.js'),
-    ];
-
-    try {
-      childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
-        if (!err) {
-          done();
-        }
-      });
-    } catch (e) {
-      console.log(`e = ${e}`);
-    }
-
-  }, 10000);
-
+  it('IFRAME Element 가 포함된 HTML Element 를 전달인자로 실행했을 때, 기대된 형태의 JSON Object 를 반환해야 한다.', () => {
+    // TODO
+  });
 });
 
 describe('watDomJSON.toDOM(obj);', () => {
@@ -83,27 +62,7 @@ describe('watDomJSON.toDOM(obj);', () => {
     expect($('#button2').css('height')).toBe('50px');
   });
 
-  it('SVG Document 가 포함된 HTML Element 의 JSON Object 를 전달인자로 실행했을 때, 기대된 형태의 HTML Element 를 반환해야 한다.', function (done) {
-    // jsdom 이 svg doucment 를 지원하지 않으므로, phantomjs 를 이용해서 테스트를 동작시킨다.
-    // 해당 phantomjs 의 경로는 /scripts/phantomjs/test/watDomJSON-toDOM.js 이다.
-    const path = require('path');
-    const childProcess = require('child_process');
-    const phantomjs = require('phantomjs-prebuilt');
-    const binPath = phantomjs.path;
-
-    var childArgs = [
-      path.join(__dirname, '../../../scripts/phantomjs/test/watDomJSON-toDOM.js'),
-    ];
-
-    try {
-      childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
-        if (!err) {
-          done();
-        }
-      });
-    } catch (e) {
-      console.log(`e = ${e}`);
-    }
-
-  }, 10000);
+  it('IFRAME Element 가 포함된 HTML Element 의 JSON Object 를 전달인자로 실행했을 때, 기대된 형태의 HTML Element 를 반환해야 한다.', () => {
+    // TODO
+  });
 });

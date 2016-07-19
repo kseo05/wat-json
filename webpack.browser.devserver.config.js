@@ -4,9 +4,6 @@ const path = require('path');
 const webpack = require('webpack');
 var webpackConfig = require('./webpack.browser.config');
 
-// webpackConfig.entry = {
-//   watJSON: ['./src/watJSON.js'],
-// };
 webpackConfig.debug = true;
 webpackConfig.devtool = 'eval-source-map';
 webpackConfig.output = {
@@ -23,7 +20,6 @@ webpackConfig.output = {
 // };
 
 var plugins = [
-  // new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoErrorsPlugin(),
 ];

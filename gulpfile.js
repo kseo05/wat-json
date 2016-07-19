@@ -1,3 +1,4 @@
+/* global __dirname */
 'use strict';
 
 var del = require('del');
@@ -7,9 +8,10 @@ var gulpConcat = require('gulp-concat');
 var gulpJsdoc2md = require('gulp-jsdoc-to-markdown');
 var gulpRename = require('gulp-rename');
 var gulpShell = require('gulp-shell');
-var webpack = require('webpack'); // eslint-disable-line no-unused-vars
+var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var webpackDevServerConfig = require('./webpack.browser.devserver.config');
+var path = require('path');
 
 var paths = {
   'src': [
@@ -46,9 +48,9 @@ gulp.task('docs:api', function () {
   return gulp.src(paths.src)
     .pipe(gulpBabel())
 		.pipe(gulpJsdoc2md())
-    .pipe(gulpRename(function (path) {
-      path.basename = 'api';
-      path.extname = '.md';
+    .pipe(gulpRename(function (pathInfo) {
+      pathInfo.basename = 'api';
+      pathInfo.extname = '.md';
     }))
 		.pipe(gulp.dest(paths.docs.dest));
 });
@@ -76,6 +78,9 @@ gulp.task('all:build:min', [ 'umd:build:min', 'browser:build:min' ]);
 
 // Dev & Demo Server tasks.
 var runDevServer = function (contentBase, port) {
+  webpackDevServerConfig.output.path = path.join(__dirname, contentBase);
+
+  var filename = 'watJSON.browser.js';
   var compiler = webpack(webpackDevServerConfig);
   var server = new WebpackDevServer(compiler, {
     contentBase: contentBase,
@@ -111,11 +116,13 @@ var runDevServer = function (contentBase, port) {
     quiet: false,
     noInfo: false,
     lazy: false,
-    filename: 'watJSON.browser.js',
+    filename: filename,
 
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+
+    inline: true,
   });
 
   server.listen(port, 'localhost', function (err, result) {
@@ -125,16 +132,12 @@ var runDevServer = function (contentBase, port) {
     }
 
     console.log(`Listening at http://localhost:${port}/webpack-dev-server/`);
-    console.log(`Listening at http://localhost:${port}/webpack-dev-server/watJSON.browser.js`);
+    console.log(`Listening at http://localhost:${port}/${filename}`);
     /* eslint-enable no-console, no-undef */
 
     // server.close();
   });
 };
-
-gulp.task('browser:demo:dev', function () {
-  runDevServer('/', 3333);
-});
 gulp.task('browser:demo:basic', function () {
   runDevServer('demo/basic', 3333);
 });

@@ -45,6 +45,13 @@ var watJSON =
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(1);
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -63,10 +70,11 @@ var watJSON =
 	   * @see {@link http://git.web-uhee.com/lib/watJSON|watJSON}
 	   */
 
-	  var acorn = __webpack_require__(1);
-	  var escodegen = __webpack_require__(2);
-	  var watDomJSON = __webpack_require__(21);
-	  var utils = __webpack_require__(22);
+	  var acorn = __webpack_require__(2);
+	  var escodegen = __webpack_require__(3);
+	  var watDomJSON = __webpack_require__(22);
+	  var commonUtils = __webpack_require__(23);
+	  var watJSONConstants = __webpack_require__(24);
 	  /* import modules - end */
 
 	  /**
@@ -184,109 +192,24 @@ var watJSON =
 
 	  var win = window || null; // eslint-disable-line no-undef
 
-	  /**
-	   * watJSON Constants.
-	   * @static
-	   * @ignore
-	   */
-	  var watJSONConstants = {
-	    defOptions: {
-	      extTypes: {
-	        undef: true,
-	        nan: true,
-	        infinity: true,
-	        date: true,
-	        regexp: true,
-	        func: false,
-	        constructorFunc: false,
-	        functionValue: false,
-	        nativeFunction: false,
-	        htmlElement: false,
-	        htmlCollection: false,
-	        proto: true,
-	        rootPrototype: false,
-	        unknownObject: true,
-	        errorObject: true
-	      },
-	      useWatDomJSON: true,
-	      useFunctionAST: false
-	    },
-	    escKeynameMap: {
-	      'constructor': '__CONSTRUCTOR__'
-	    },
-	    unescKeynameMap: {}, // initialize dynamically.
-	    extTypeMap: {
-	      string: '__STRING__',
-	      number: '__NUMBER__',
-	      bool: '__BOOLEAN__',
-	      nul: '__NULL__',
-	      array: '__ARRAY__',
-
-	      undef: '__UNDEFINED__',
-	      nan: '__NAN__',
-	      infinity: '__INFINITY__',
-	      date: '__DATE__',
-	      regexp: '__REGEXP__',
-	      func: '__FUNCTION__',
-	      nativeFunction: '__NATIVEFUNC__',
-	      htmlElement: '__HTMLELEMENT__',
-	      htmlCollection: '__HTMLCOLLECTION__',
-	      rootPrototype: '__ROOTPROTO__',
-	      proto: '__PROTO__',
-	      unknownObject: '__UNKNOWN__',
-	      errorObject: '__ERROR__',
-	      ignoredProp: '__IGNOREDPROP__',
-	      constructorFunc: '__CONSTRUCTOR__'
-	    },
-	    watDomJSON: {
-	      options: {
-	        toWatJSON: {
-	          metadata: false,
-	          stringify: false
-	        },
-	        fromWatJSON: {
-	          metadata: false,
-	          noMeta: true,
-	          stringify: false
-	        },
-	        stringify: {
-	          metadata: false,
-	          stringify: true
-	        },
-	        parse: {
-	          metadata: false,
-	          noMeta: true,
-	          stringify: true
-	        }
-	      }
-	    },
-	    functionAst: {
-	      options: { sourceType: 'module' }
-	    }
-	  };
-
-	  // Initialize watJSONConstants.escKeynameMap.
-	  Object.keys(watJSONConstants.escKeynameMap).forEach(function (key) {
-	    if (!(typeof key === 'string')) {
-	      throw new TypeError('Value of argument "key" violates contract.\n\nExpected:\nstring\n\nGot:\n' + _inspect(key));
-	    }
-
-	    watJSONConstants.unescKeynameMap[watJSONConstants.escKeynameMap[key]] = key;
-	  });
-
 	  /* private methods - begin */
 	  /**
 	   * The main function for `watJSON.fromWatJSON(obj, opt)` and `watJson.parse(str, opt)`.
-	   * @param {any} obj
+	   * @param  {any} obj
 	   * @param  {watJSON.Options} opt
+	   * @param  {Object=} context
 	   * @return {any}
 	   * @static
 	   * @private
 	   * @ignore
 	   */
-	  var _fromWatJSON = function _fromWatJSON(obj, opt) {
+	  var _fromWatJSON = function _fromWatJSON(obj, opt, context) {
 	    if (!Options(opt)) {
 	      throw new TypeError('Value of argument "opt" violates contract.\n\nExpected:\nOptions\n\nGot:\n' + _inspect(opt));
+	    }
+
+	    if (!(context instanceof Object || context == null)) {
+	      throw new TypeError('Value of argument "context" violates contract.\n\nExpected:\nObject | null\n\nGot:\n' + _inspect(context));
 	    }
 
 	    var result;
@@ -414,7 +337,7 @@ var watJSON =
 	      } else if (obj[watJSONConstants.extTypeMap.unknownObject]) {
 	        return getIgnoredProp();
 	      } else if (obj[watJSONConstants.extTypeMap.errorObject]) {
-	        return utils.clone(obj);
+	        return commonUtils.clone(obj);
 
 	        // Handle root prototype.
 	      } else if (obj[watJSONConstants.extTypeMap.rootPrototype]) {
@@ -619,7 +542,7 @@ var watJSON =
 	            throw new TypeError('Value of variable "extendedType" violates contract.\n\nExpected:\nstring | null\n\nGot:\n' + _inspect(extendedType));
 	          }
 
-	          result = 'new RegExp("' + utils.escapeJSON(obj.source) + '","' + obj.flags + '")';
+	          result = 'new RegExp("' + commonUtils.escapeJSON(obj.source) + '","' + obj.flags + '")';
 	        } else {
 	          return getIgnoredProp();
 	        }
@@ -830,14 +753,14 @@ var watJSON =
 	      throw new TypeError('Value of optional argument "options" violates contract.\n\nExpected:\nOptions\n\nGot:\n' + _inspect(options));
 	    }
 
-	    var opt = utils.extend({}, watJSONConstants.defOptions, options);
+	    var opt = commonUtils.extend(watJSONConstants.defOptions, options);
 
 	    if (!(opt instanceof Object)) {
 	      throw new TypeError('Value of variable "opt" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(opt));
 	    }
 
 	    if (options) {
-	      opt.extTypest = utils.extend({}, watJSONConstants.defOptions.extTypes, options.extTypes);
+	      opt.extTypes = commonUtils.extend(watJSONConstants.defOptions.extTypes, options.extTypes);
 	    }
 
 	    var result;
@@ -916,14 +839,14 @@ var watJSON =
 	      throw new TypeError('Value of optional argument "options" violates contract.\n\nExpected:\nOptions\n\nGot:\n' + _inspect(options));
 	    }
 
-	    var opt = utils.extend({}, watJSONConstants.defOptions, options);
+	    var opt = commonUtils.extend(watJSONConstants.defOptions, options);
 
 	    if (!(opt instanceof Object)) {
 	      throw new TypeError('Value of variable "opt" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(opt));
 	    }
 
 	    if (options) {
-	      opt.extTypes = utils.extend({}, watJSONConstants.defOptions.extTypes, options.extTypes);
+	      opt.extTypes = commonUtils.extend(watJSONConstants.defOptions.extTypes, options.extTypes);
 	    }
 
 	    var object;
@@ -1025,7 +948,7 @@ var watJSON =
 	}
 
 /***/ },
-/* 1 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;"use strict";var _typeof=typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"?function(obj){return typeof obj;}:function(obj){return obj&&typeof Symbol==="function"&&obj.constructor===Symbol?"symbol":typeof obj;};(function(f){if(( false?"undefined":_typeof(exports))==="object"&&typeof module!=="undefined"){module.exports=f();}else if(true){!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (f), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));}else {var g;if(typeof window!=="undefined"){g=window;}else if(typeof global!=="undefined"){g=global;}else if(typeof self!=="undefined"){g=self;}else {g=this;}g.acorn=f();}})(function(){var define,module,exports;return function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f;}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e);},l,l.exports,e,t,n,r);}return n[o].exports;}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++){s(r[o]);}return s;}({1:[function(_dereq_,module,exports){ // A recursive descent parser operates by defining functions for all
@@ -1508,7 +1431,7 @@ var watJSON =
 		"use strict";exports.__esModule=true;exports.isNewLine=isNewLine;var lineBreak=/\r\n?|\n|\u2028|\u2029/;exports.lineBreak=lineBreak;var lineBreakG=new RegExp(lineBreak.source,"g");exports.lineBreakG=lineBreakG;function isNewLine(code){return code===10||code===13||code===0x2028||code==0x2029;}var nonASCIIwhitespace=/[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/;exports.nonASCIIwhitespace=nonASCIIwhitespace;var skipWhiteSpace=/(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g;exports.skipWhiteSpace=skipWhiteSpace;},{}]},{},[3])(3);});
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -1556,8 +1479,8 @@ var watJSON =
 
 	    var Syntax, Precedence, BinaryPrecedence, SourceNode, estraverse, esutils, isArray, base, indent, json, renumber, hexadecimal, quotes, escapeless, newline, space, parentheses, semicolons, safeConcatenation, directive, extra, parse, sourceMap, sourceCode, preserveBlankLines, FORMAT_MINIFY, FORMAT_DEFAULTS;
 
-	    estraverse = __webpack_require__(3);
-	    esutils = __webpack_require__(4);
+	    estraverse = __webpack_require__(4);
+	    esutils = __webpack_require__(5);
 
 	    Syntax = estraverse.Syntax;
 
@@ -3932,7 +3855,7 @@ var watJSON =
 	            if (!exports.browser) {
 	                // We assume environment is node.js
 	                // And prevent from including source-map by browserify
-	                SourceNode = __webpack_require__(8).SourceNode;
+	                SourceNode = __webpack_require__(9).SourceNode;
 	            } else {
 	                SourceNode = global.sourceMap.SourceNode;
 	            }
@@ -3977,7 +3900,7 @@ var watJSON =
 
 	    FORMAT_DEFAULTS = getDefaultOptions().format;
 
-	    exports.version = __webpack_require__(20).version;
+	    exports.version = __webpack_require__(21).version;
 	    exports.generate = generate;
 	    exports.attachComments = estraverse.attachComments;
 	    exports.Precedence = updateDeeply({}, Precedence);
@@ -3989,7 +3912,7 @@ var watJSON =
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -4823,7 +4746,7 @@ var watJSON =
 	/* vim: set sw=4 ts=4 et tw=80 : */
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4855,14 +4778,14 @@ var watJSON =
 	(function () {
 	  'use strict';
 
-	  exports.ast = __webpack_require__(5);
-	  exports.code = __webpack_require__(6);
-	  exports.keyword = __webpack_require__(7);
+	  exports.ast = __webpack_require__(6);
+	  exports.code = __webpack_require__(7);
+	  exports.keyword = __webpack_require__(8);
 	})();
 	/* vim: set sw=4 ts=4 et tw=80 : */
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5019,7 +4942,7 @@ var watJSON =
 	/* vim: set sw=4 ts=4 et tw=80 : */
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5154,7 +5077,7 @@ var watJSON =
 	/* vim: set sw=4 ts=4 et tw=80 : */
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5186,7 +5109,7 @@ var watJSON =
 	(function () {
 	    'use strict';
 
-	    var code = __webpack_require__(6);
+	    var code = __webpack_require__(7);
 
 	    function isStrictModeReservedWordES6(id) {
 	        switch (id) {
@@ -5328,7 +5251,7 @@ var watJSON =
 	/* vim: set sw=4 ts=4 et tw=80 : */
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5338,12 +5261,12 @@ var watJSON =
 	 * Licensed under the New BSD license. See LICENSE.txt or:
 	 * http://opensource.org/licenses/BSD-3-Clause
 	 */
-	exports.SourceMapGenerator = __webpack_require__(9).SourceMapGenerator;
-	exports.SourceMapConsumer = __webpack_require__(15).SourceMapConsumer;
-	exports.SourceNode = __webpack_require__(19).SourceNode;
+	exports.SourceMapGenerator = __webpack_require__(10).SourceMapGenerator;
+	exports.SourceMapConsumer = __webpack_require__(16).SourceMapConsumer;
+	exports.SourceNode = __webpack_require__(20).SourceNode;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -5359,10 +5282,10 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var base64VLQ = __webpack_require__(10);
-	  var util = __webpack_require__(12);
-	  var ArraySet = __webpack_require__(13).ArraySet;
-	  var MappingList = __webpack_require__(14).MappingList;
+	  var base64VLQ = __webpack_require__(11);
+	  var util = __webpack_require__(13);
+	  var ArraySet = __webpack_require__(14).ArraySet;
+	  var MappingList = __webpack_require__(15).MappingList;
 
 	  /**
 	   * An instance of the SourceMapGenerator represents a source map which is
@@ -5718,7 +5641,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -5764,7 +5687,7 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var base64 = __webpack_require__(11);
+	  var base64 = __webpack_require__(12);
 
 	  // A single base 64 digit can contain 6 bits of data. For the base 64 variable
 	  // length quantities we use in the source map spec, the first bit is the sign,
@@ -5862,7 +5785,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -5908,7 +5831,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -6229,7 +6152,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -6245,7 +6168,7 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var util = __webpack_require__(12);
+	  var util = __webpack_require__(13);
 
 	  /**
 	   * A data structure which is a combination of an array and a set. Adding a new
@@ -6331,7 +6254,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -6347,7 +6270,7 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var util = __webpack_require__(12);
+	  var util = __webpack_require__(13);
 
 	  /**
 	   * Determine whether mappingB is after mappingA with respect to generated
@@ -6421,7 +6344,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -6437,7 +6360,7 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var util = __webpack_require__(12);
+	  var util = __webpack_require__(13);
 
 	  function SourceMapConsumer(aSourceMap) {
 	    var sourceMap = aSourceMap;
@@ -6447,16 +6370,16 @@ var watJSON =
 
 	    // We do late requires because the subclasses require() this file.
 	    if (sourceMap.sections != null) {
-	      var indexedSourceMapConsumer = __webpack_require__(16);
+	      var indexedSourceMapConsumer = __webpack_require__(17);
 	      return new indexedSourceMapConsumer.IndexedSourceMapConsumer(sourceMap);
 	    } else {
-	      var basicSourceMapConsumer = __webpack_require__(18);
+	      var basicSourceMapConsumer = __webpack_require__(19);
 	      return new basicSourceMapConsumer.BasicSourceMapConsumer(sourceMap);
 	    }
 	  }
 
 	  SourceMapConsumer.fromSourceMap = function (aSourceMap) {
-	    var basicSourceMapConsumer = __webpack_require__(18);
+	    var basicSourceMapConsumer = __webpack_require__(19);
 	    return basicSourceMapConsumer.BasicSourceMapConsumer.fromSourceMap(aSourceMap);
 	  };
 
@@ -6639,7 +6562,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -6655,10 +6578,10 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var util = __webpack_require__(12);
-	  var binarySearch = __webpack_require__(17);
-	  var SourceMapConsumer = __webpack_require__(15).SourceMapConsumer;
-	  var BasicSourceMapConsumer = __webpack_require__(18).BasicSourceMapConsumer;
+	  var util = __webpack_require__(13);
+	  var binarySearch = __webpack_require__(18);
+	  var SourceMapConsumer = __webpack_require__(16).SourceMapConsumer;
+	  var BasicSourceMapConsumer = __webpack_require__(19).BasicSourceMapConsumer;
 
 	  /**
 	   * An IndexedSourceMapConsumer instance represents a parsed source map which
@@ -6929,7 +6852,7 @@ var watJSON =
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -7013,7 +6936,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -7029,11 +6952,11 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var util = __webpack_require__(12);
-	  var binarySearch = __webpack_require__(17);
-	  var ArraySet = __webpack_require__(13).ArraySet;
-	  var base64VLQ = __webpack_require__(10);
-	  var SourceMapConsumer = __webpack_require__(15).SourceMapConsumer;
+	  var util = __webpack_require__(13);
+	  var binarySearch = __webpack_require__(18);
+	  var ArraySet = __webpack_require__(14).ArraySet;
+	  var base64VLQ = __webpack_require__(11);
+	  var SourceMapConsumer = __webpack_require__(16).SourceMapConsumer;
 
 	  /**
 	   * A BasicSourceMapConsumer instance represents a parsed source map which we can
@@ -7413,7 +7336,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -7429,8 +7352,8 @@ var watJSON =
 	}
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require, exports, module) {
 
-	  var SourceMapGenerator = __webpack_require__(9).SourceMapGenerator;
-	  var util = __webpack_require__(12);
+	  var SourceMapGenerator = __webpack_require__(10).SourceMapGenerator;
+	  var util = __webpack_require__(13);
 
 	  // Matches a Windows-style `\r\n` newline or a `\n` newline used by all other
 	  // operating systems these days (capturing the result).
@@ -7807,7 +7730,7 @@ var watJSON =
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -7932,7 +7855,7 @@ var watJSON =
 	};
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -7941,8 +7864,8 @@ var watJSON =
 
 	/**
 	 * watDomJSON.js: watDomJSON is forked from domJSON v0.1.2 for watJSON.
-	 * It contains several bug fixes.
-	 * It also supports parsing SVG Documents/Elements.
+	 * It supports parsing SVG Documents / Content Document.
+	 * It also contains several bug fixes.
 	 *
 	 * @file
 	 * @module watDomJSON
@@ -7984,7 +7907,7 @@ var watJSON =
 
 		var domJSON = {};
 
-		// For jsdom shiped by jest.
+		// For phantomjs and jsdom shiped by jest.
 		win = win || window;
 
 		/**
@@ -8000,8 +7923,8 @@ var watJSON =
 	  * @ignore
 	  */
 		var metadata = {
-			href: win.location.href || null,
-			userAgent: window.navigator && window.navigator.userAgent ? window.navigator.userAgent : null,
+			href: win.location && win.location.href ? win.location.href : null,
+			userAgent: win.navigator && win.navigator.userAgent ? win.navigator.userAgent : null,
 			version: '0.1.0'
 		};
 
@@ -8451,6 +8374,13 @@ var watJSON =
 
 				//Append the children in the appropriate place
 				copy.childNodes = children;
+
+				//Append conttent Document / SVG Document
+				if (node.contentDocument) {
+					copy.contentDocument = _toJSON(node.contentDocument, opts, depth + 1);
+				} else if (node.getSVGDocument) {
+					copy.svgDocument = _toJSON(node.getSVGDocument(), opts, depth + 1);
+				}
 			}
 			return copy;
 		};
@@ -8494,7 +8424,11 @@ var watJSON =
 			options.serialProperties = toShorthand(options.serialProperties);
 
 			//Make sure there is a base URL for absolute path conversions
-			options.absoluteBase = win.location.origin + '/';
+			if (win.location && win.location.origin) {
+				options.absoluteBase = win.location.origin + '/';
+			} else {
+				options.absoluteBase = '';
+			}
 
 			//Make lists of which DOM properties to skip and/or which are absolutely necessary
 			if (options.serialProperties !== true) {
@@ -8532,12 +8466,12 @@ var watJSON =
 					date: new Date().toISOString(),
 					dimensions: {
 						inner: {
-							x: window.innerWidth,
-							y: window.innerHeight
+							x: win.innerWidth,
+							y: win.innerHeight
 						},
 						outer: {
-							x: window.outerWidth,
-							y: window.outerHeight
+							x: win.outerWidth,
+							y: win.outerHeight
 						}
 					},
 					options: options
@@ -8709,19 +8643,13 @@ var watJSON =
 	});
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	'use strict';
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-	/**
-	 * Same as _.extend. shallow-copy.
-	 * @param  {Object} obj target.
-	 * @param  {...Object} sources sources.
-	 * @return {Object} extended target.
-	 */
 	var extend = function extend(obj) {
 	  if (!(obj instanceof Object)) {
 	    throw new TypeError('Value of argument "obj" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(obj));
@@ -8756,6 +8684,11 @@ var watJSON =
 	 * @param  {Object} obj target
 	 * @return {Object} shallow-copied object.
 	 */
+
+	if (!(typeof extend === 'function')) {
+	  throw new TypeError('Value of variable "extend" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(extend));
+	}
+
 	var clone = function clone(obj) {
 	  if (!(obj instanceof Object)) {
 	    throw new TypeError('Value of argument "obj" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(obj));
@@ -8769,6 +8702,11 @@ var watJSON =
 	 * @param  {string} str string to escape.
 	 * @return {string} escaped string.
 	 */
+
+	if (!(typeof clone === 'function')) {
+	  throw new TypeError('Value of variable "clone" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(clone));
+	}
+
 	var escapeJSON = function escapeJSON(str) {
 	  function _ref3(_id3) {
 	    if (!(typeof _id3 === 'string')) {
@@ -8791,10 +8729,35 @@ var watJSON =
 	  .replace(/"/g, '\\"')); // Doucle Quote
 	};
 
+	/**
+	 * Evaluate in context.
+	 * @param {string} code Javascript code to evaluate.
+	 * @param {any} context
+	 */
+
+	if (!(typeof escapeJSON === 'function')) {
+	  throw new TypeError('Value of variable "escapeJSON" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(escapeJSON));
+	}
+
+	var evalInContext = function evalInContext(code, context) {
+	  if (!(typeof code === 'string')) {
+	    throw new TypeError('Value of argument "code" violates contract.\n\nExpected:\nstring\n\nGot:\n' + _inspect(code));
+	  }
+
+	  return function () {
+	    return eval(code);
+	  }.call(context);
+	};
+
+	if (!(typeof evalInContext === 'function')) {
+	  throw new TypeError('Value of variable "evalInContext" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(evalInContext));
+	}
+
 	module.exports = {
 	  extend: extend,
 	  clone: clone,
-	  escapeJSON: escapeJSON
+	  escapeJSON: escapeJSON,
+	  evalInContext: evalInContext
 	};
 
 	function _inspect(input, depth) {
@@ -8869,6 +8832,100 @@ var watJSON =
 	    }
 	  }
 	}
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * watJSON Constants.
+	 * @static
+	 * @ignore
+	 */
+	var watJSONConstants = {
+	  defOptions: {
+	    extTypes: {
+	      undef: true,
+	      nan: true,
+	      infinity: true,
+	      date: true,
+	      regexp: true,
+	      func: false,
+	      constructorFunc: false,
+	      functionValue: false,
+	      nativeFunction: false,
+	      htmlElement: false,
+	      htmlCollection: false,
+	      proto: true,
+	      rootPrototype: false,
+	      unknownObject: true,
+	      errorObject: true
+	    },
+	    useWatDomJSON: true,
+	    useFunctionAST: false
+	  },
+	  escKeynameMap: {
+	    'constructor': '__CONSTRUCTOR__'
+	  },
+	  unescKeynameMap: {}, // initialize dynamically.
+	  extTypeMap: {
+	    string: '__STRING__',
+	    number: '__NUMBER__',
+	    bool: '__BOOLEAN__',
+	    nul: '__NULL__',
+	    array: '__ARRAY__',
+
+	    undef: '__UNDEFINED__',
+	    nan: '__NAN__',
+	    infinity: '__INFINITY__',
+	    date: '__DATE__',
+	    regexp: '__REGEXP__',
+	    func: '__FUNCTION__',
+	    nativeFunction: '__NATIVEFUNC__',
+	    htmlElement: '__HTMLELEMENT__',
+	    htmlCollection: '__HTMLCOLLECTION__',
+	    rootPrototype: '__ROOTPROTO__',
+	    proto: '__PROTO__',
+	    unknownObject: '__UNKNOWN__',
+	    errorObject: '__ERROR__',
+	    ignoredProp: '__IGNOREDPROP__',
+	    constructorFunc: '__CONSTRUCTOR__'
+	  },
+	  watDomJSON: {
+	    options: {
+	      toWatJSON: {
+	        metadata: false,
+	        stringify: false
+	      },
+	      fromWatJSON: {
+	        metadata: false,
+	        noMeta: true,
+	        stringify: false
+	      }
+	    }
+	  },
+	  // stringify: {
+	  //   metadata: false,
+	  //   stringify: true,
+	  // },
+	  // parse: {
+	  //   metadata: false,
+	  //   noMeta: true,
+	  //   stringify: true,
+	  // },
+	  functionAst: {
+	    options: { sourceType: 'module' }
+	  }
+	};
+
+	// Initialize watJSONConstants.escKeynameMap.
+	Object.keys(watJSONConstants.escKeynameMap).forEach(function (key) {
+	  watJSONConstants.unescKeynameMap[watJSONConstants.escKeynameMap[key]] = key;
+	});
+
+	module.exports = watJSONConstants;
 
 /***/ }
 /******/ ]);

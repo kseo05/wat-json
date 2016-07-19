@@ -26,10 +26,11 @@
     </div>
   </div>
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.js"></script>
-  <script type="text/javascript" src="/watJSON.browser.js"></script>
+  <script type="text/javascript" src="http://localhost:3333/watJSON.browser.js"></script>
   <script>
   $(function() {
-    var toWatJSONOptions = {
+    window.result = {};
+    window.result.document = watJSON.toWatJSON(document, {
       extTypes: {
         undef: true,
         nan: true,
@@ -49,12 +50,29 @@
       },
       useWatDomJSON: true,
       useFunctionAST: true,
-    };
-
-    window.result = {};
-    window.result.document = watJSON.toWatJSON(document, toWatJSONOptions);
-    window.result.body = watJSON.toWatJSON(document.body, toWatJSONOptions);
-    // window.result.model = 0; // TODO
+    });
+    window.result.body = watJSON.toWatJSON(document.body, {
+      extTypes: {
+        undef: true,
+        nan: true,
+        infinity: true,
+        date: true,
+        regexp: true,
+        func: true,
+        constructorFunc: true,
+        functionValue: true,
+        nativeFunction: true,
+        htmlElement: true,
+        htmlCollection: true,
+        proto: true,
+        rootPrototype: true,
+        unknownObject: true,
+        errorObject: true,
+      },
+      useWatDomJSON: true,
+      useFunctionAST: true,
+    });
+    // window.result.model = 0;
   });
   </script>
 </body>

@@ -113,3 +113,15 @@ describe('acorn & escodegen', () => {
     // );
   });
 });
+
+describe('built file "watJSON.min.js"', () => {
+  it('should return expected value - watJSON.toWatJSON()', () => {
+    const Constants = require('./Constants');
+    const watJSON = require('../../dist/watJSON.min');
+
+    document.body.innerHTML = Constants.sample.bodyString;
+    var htmlElement = document.getElementsByClassName('container')[0];
+
+    console.log(watJSON.toWatJSON(htmlElement, Constants.options.available));
+  });
+});

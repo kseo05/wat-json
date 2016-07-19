@@ -14,7 +14,9 @@
     "test": "node ./node_modules/jest-cli/bin/jest.js",
     "coverage": "node ./node_modules/jest-cli/bin/jest.js --coverage",
     "test-debug": "node debug --harmony ./node_modules/jest-cli/bin/jest.js --runInBand",
-    "test-debug-inspector": "node-debug --nodejs --harmony ./node_modules/jest-cli/bin/jest.js --runInBand"
+    "test-debug-inspector": "node-debug --nodejs --harmony ./node_modules/jest-cli/bin/jest.js --runInBand",
+    "dev-server": "node ./node_modules/gulp-cli/bin/gulp.js browser:demo:dev",
+    "demo-server": "node ./node_modules/gulp-cli/bin/gulp.js browser:demo:basic"
   },
   "repository": {
     "type": "git",
@@ -68,7 +70,8 @@
     "json-loader": "^0.5.4",
     "jsonpath": "^0.2.4",
     "phantomjs-prebuilt": "^2.1.7",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.1",
+    "webpage": "^0.3.0"
   },
   "jest": {
     "cache": true,

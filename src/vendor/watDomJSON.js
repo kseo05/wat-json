@@ -1,6 +1,6 @@
 /**
  * watDomJSON.js: watDomJSON is forked from domJSON v0.1.2 for watJSON.
- * It supports parsing SVG Documents.
+ * It supports parsing SVG Documents / Content Document.
  * It also contains several bug fixes.
  *
  * @file
@@ -40,7 +40,7 @@
 	 */
 	var domJSON = {};
 
-	// For jsdom shiped by jest.
+	// For phantomjs and jsdom shiped by jest.
 	win = win || window;
 
 	/**
@@ -58,10 +58,11 @@
 	 * @ignore
 	 */
 	var metadata = {
-		href: win.location.href || null,
-		userAgent: window.navigator && window.navigator.userAgent ? window.navigator.userAgent : null,
+		href: win.location && win.location.href ? win.location.href : null,
+		userAgent: win.navigator && win.navigator.userAgent ? win.navigator.userAgent : null,
 		version: '0.1.0'
 	};
+
 
 
 
@@ -558,8 +559,10 @@
 			//Append the children in the appropriate place
 			copy.childNodes = children;
 
-			//Append SVG Document
-			if (node.getSVGDocument) {
+			//Append conttent Document / SVG Document
+			if (node.contentDocument) {
+				copy.contentDocument = _toJSON(node.contentDocument, opts, depth + 1);
+			} else if (node.getSVGDocument) {
 				copy.svgDocument = _toJSON(node.getSVGDocument(), opts, depth + 1);
 			}
 		}
@@ -604,7 +607,11 @@
 		options.serialProperties = toShorthand(options.serialProperties);
 
 		//Make sure there is a base URL for absolute path conversions
-		options.absoluteBase = win.location.origin + '/';
+		if (win.location && win.location.origin) {
+			options.absoluteBase = win.location.origin + '/';
+		} else {
+			options.absoluteBase = '';
+		}
 
 		//Make lists of which DOM properties to skip and/or which are absolutely necessary
 		if (options.serialProperties !== true) {
@@ -642,12 +649,12 @@
 				date: new Date().toISOString(),
 				dimensions: {
 					inner: {
-						x: window.innerWidth,
-						y: window.innerHeight
+						x: win.innerWidth,
+						y: win.innerHeight
 					},
 					outer: {
-						x: window.outerWidth,
-						y: window.outerHeight
+						x: win.outerWidth,
+						y: win.outerHeight
 					}
 				},
 				options: options

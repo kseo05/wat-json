@@ -1,3 +1,5 @@
+'use strict';
+
 var sample = {};
 sample.toWatJSON = {};
 sample.toWatJSON.string = 'string';
@@ -1112,16 +1114,6 @@ sample.fromWatJSON.classInst.minimized = {
 sample.bodyString = '<div class=\'container\'>' +
   '  <span id=\'username\'>1234</span>' +
   '  <button id=\'button\' class=\'btn-test\' style=\'width:30px;height:20px\' />' +
-  '</div>';
-sample.svgString = '<div class=\'container\'>' +
-  '  <span id=\'username\'>1234</span>' +
-  '  <button id=\'button\' class=\'btn-test\' style=\'width:30px;height:20px\' />' +
-  '  <div id=\'svg-container\'>' +
-  '    <svg width=\'100\' height=\'100\'>' +
-  '      <circle cx=\'50\' cy=\'50\' r=\'40\' stroke=\'green\' stroke-width=\'4\' fill=\'yellow\' />' +
-  '      Sorry, your browser does not support inline SVG.' +
-  '    </svg>' +
-  '  </div>' +
   '</div>';
 
 module.exports = {

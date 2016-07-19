@@ -1,7 +1,3 @@
-[![npm version](https://badge.fury.io/js/escodegen.svg)](http://badge.fury.io/js/escodegen)
-[![Build Status](https://secure.travis-ci.org/estools/escodegen.svg)](http://travis-ci.org/estools/escodegen)
-[![Dependency Status](https://david-dm.org/estools/escodegen.svg)](https://david-dm.org/estools/escodegen)
-[![devDependency Status](https://david-dm.org/estools/escodegen/dev-status.svg)](https://david-dm.org/estools/escodegen#info=devDependencies)
 
 <a name="module_watJSON"></a>
 
@@ -87,8 +83,6 @@ Common converting options.
 ## Install
 
 ## Examples
-* watJSON.toWatJSON(obj, options)
-* watJSON.fromWatJSON(obj, options)
 
 ## License
 
