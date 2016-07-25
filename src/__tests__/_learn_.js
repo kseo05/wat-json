@@ -119,9 +119,21 @@ describe('built file "watJSON.min.js"', () => {
     const Constants = require('./Constants');
     const watJSON = require('../../dist/watJSON.min');
 
-    document.body.innerHTML = Constants.sample.bodyString;
-    var htmlElement = document.getElementsByClassName('container')[0];
+    if (watJSON && watJSON.toWatJSON) {
+      document.body.innerHTML = Constants.sample.bodyString;
+      var htmlElement = document.getElementsByClassName('container')[0];
+      var result = watJSON.toWatJSON(htmlElement, Constants.options.available);
+      // console.log(JSON.stringify(result, null, 1));
+    }
+  });
+  if('should return expected value - watJSON.fromWatJSON()', () => {
+    const Constants = require('./Constants');
+    const watJSON = require('../../dist/watJSON.min');
 
-    console.log(watJSON.toWatJSON(htmlElement, Constants.options.available));
+    if (watJSON && watJSON.fromWatJSON) {
+      var sampleObject = Constants.sample.fromWatJSON.classInst.available;
+      var result = watJSON.fromWatJSON(sampleObject, Constants.options.available);
+      console.log(`result = ${result.str}`);
+    }
   });
 });

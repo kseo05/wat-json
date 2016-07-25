@@ -83,6 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var watJSONConstants = __webpack_require__(24);
 	/* import modules - end */
 
+	/* define custom object type - begin */
 	/**
 	 * JSON-friendly object type.
 	 * You can handle it as a JSON-formatted object.
@@ -158,7 +159,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @property {Object} extTypes Options about converting objects which JSON global object cannot convert.
 	 * @property {boolean} extTypes.undef=true Use `true` if you wanna convert `undefined` objects.
 	 * @property {boolean} extTypes.nan=true Use `true` if you wanna convert `NaN` objects.
-	 * @property {boolean} extTypes.infinity=true Use `true` if you wanna convert `Infinity` objects.
+	 * @property {boolean} extTypes.InfinityNative=true Use `true` if you wanna convert `InfinityNative` objects.
 	 * @property {boolean} extTypes.func=false Use `true` if you wanna convert function objects.
 	 * @property {boolean} extTypes.constructorFunc=false Use `true` if you wanna convert the `constructor` of instances.
 	 * @property {boolean} extTypes.functionValue=false Use `true` if you wanna convert between the `function` source code and a string when converting function objects.
@@ -166,7 +167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @property {boolean} extTypes.htmlElement=false Use `true` if you wanna convert `HTMLElement` objects. It is just used in a web browser.
 	 * @property {boolean} extTypes.htmlCollection=false Use `true` if you wanna convert `HTMLCollection` objects. It is just used in a web browser.
 	 * @property {boolean} extTypes.proto=true Use `true` if you wanna convert the prototype of objects until the converter reaches the instance of `Object`.
-	 * @property {boolean} extTypes.rootPrototype=false Use `true` if you wanna convert `Object.prototype`.
+	 * @property {boolean} extTypes.rootPrototype=false Use `true` if you wanna convert `objectPrototypeNative`.
 	 * @property {boolean} extTypes.unknownObject=true Use `true` if you wanna convert objects when watJSON could not find out its type.
 	 * @property {boolean} extTypes.errorObject=true Use `true` if you wanna get conversion error objects.
 	 * @property {boolean} useWatDomJSON=true You can use watDomJSON library when you convert between `HTMLElement`/`HTMLCollection` object and `WatDomJSON` object. If you don't use this option, parsed result will be a html string.
@@ -177,7 +178,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Options = function () {
 	  function Options(input) {
-	    return input != null && input.extTypes != null && typeof input.extTypes.undef === 'boolean' && typeof input.extTypes.nan === 'boolean' && typeof input.extTypes.infinity === 'boolean' && typeof input.extTypes.func === 'boolean' && typeof input.extTypes.constructorFunc === 'boolean' && typeof input.extTypes.functionValue === 'boolean' && typeof input.extTypes.nativeFunction === 'boolean' && typeof input.extTypes.htmlElement === 'boolean' && typeof input.extTypes.htmlCollection === 'boolean' && typeof input.extTypes.proto === 'boolean' && typeof input.extTypes.rootPrototype === 'boolean' && typeof input.extTypes.unknownObject === 'boolean' && typeof input.extTypes.errorObject === 'boolean' && typeof input.useWatDomJSON === 'boolean' && typeof input.useFunctionAST === 'boolean';
+	    return input != null && input.extTypes != null && typeof input.extTypes.undef === 'boolean' && typeof input.extTypes.nan === 'boolean' && typeof input.extTypes.InfinityNative === 'boolean' && typeof input.extTypes.func === 'boolean' && typeof input.extTypes.constructorFunc === 'boolean' && typeof input.extTypes.functionValue === 'boolean' && typeof input.extTypes.nativeFunction === 'boolean' && typeof input.extTypes.htmlElement === 'boolean' && typeof input.extTypes.htmlCollection === 'boolean' && typeof input.extTypes.proto === 'boolean' && typeof input.extTypes.rootPrototype === 'boolean' && typeof input.extTypes.unknownObject === 'boolean' && typeof input.extTypes.errorObject === 'boolean' && typeof input.useWatDomJSON === 'boolean' && typeof input.useFunctionAST === 'boolean';
 	  }
 
 	  ;
@@ -188,6 +189,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	  return Options;
 	}();
+	/* define custom object type - end */
+
+	/* private variables - begin */
+
+
+	var objectPrototypeNative = Object.prototype;
+
+	if (!(objectPrototypeNative instanceof Object)) {
+	  throw new TypeError('Value of variable "objectPrototypeNative" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(objectPrototypeNative));
+	}
+
+	var InfinityNative = Infinity;
+	var undefinedNative = undefined;
+
+	if (!(undefinedNative == null)) {
+	  throw new TypeError('Value of variable "undefinedNative" violates contract.\n\nExpected:\nnull\n\nGot:\n' + _inspect(undefinedNative));
+	}
+
+	var inNaNNative = Number.isNaN;
+
+	if (!(typeof inNaNNative === 'function')) {
+	  throw new TypeError('Value of variable "inNaNNative" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(inNaNNative));
+	}
+
+	var isFiniteNative = Number.isFinite;
+
+	if (!(typeof isFiniteNative === 'function')) {
+	  throw new TypeError('Value of variable "isFiniteNative" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(isFiniteNative));
+	}
+
+	var evalNative = eval;
+
+	if (!(typeof evalNative === 'function')) {
+	  throw new TypeError('Value of variable "evalNative" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(evalNative));
+	}
+
+	var getOwnPropertyNamesNative = Object.getOwnPropertyNames;
+
+	if (!(typeof getOwnPropertyNamesNative === 'function')) {
+	  throw new TypeError('Value of variable "getOwnPropertyNamesNative" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(getOwnPropertyNamesNative));
+	}
+
+	var getPrototypeOfNative = Object.getPrototypeOf;
 
 	/**
 	 * An `Window` object represents an open window in a browser.
@@ -195,27 +239,60 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @ignore
 	 */
 
+	if (!(typeof getPrototypeOfNative === 'function')) {
+	  throw new TypeError('Value of variable "getPrototypeOfNative" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(getPrototypeOfNative));
+	}
 
 	var win = window || null; // eslint-disable-line no-undef
 
-	/* private methods - begin */
+	if (!(win instanceof Object || win == null)) {
+	  throw new TypeError('Value of variable "win" violates contract.\n\nExpected:\nObject | null\n\nGot:\n' + _inspect(win));
+	}
+
+	var HTMLDocumentNative = win ? win.HTMLDocumentNative : null;
+
+	if (!(typeof HTMLDocumentNative === 'function' || HTMLDocumentNative == null)) {
+	  throw new TypeError('Value of variable "HTMLDocumentNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(HTMLDocumentNative));
+	}
+
+	var HTMLCollectionNative = win ? win.HTMLCollection : null;
+
+	if (!(typeof HTMLCollectionNative === 'function' || HTMLCollectionNative == null)) {
+	  throw new TypeError('Value of variable "HTMLCollectionNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(HTMLCollectionNative));
+	}
+
+	var HTMLElementNative = win ? win.HTMLElement : null;
+
+	if (!(typeof HTMLElementNative === 'function' || HTMLElementNative == null)) {
+	  throw new TypeError('Value of variable "HTMLElementNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(HTMLElementNative));
+	}
+
+	var createElementNative = win ? win.document.createElement : null;
+
+	/**
+	 * Javascript object constructor.
+	 * @static
+	 * @ignore
+	 */
+
+	if (!(typeof createElementNative === 'function' || createElementNative == null)) {
+	  throw new TypeError('Value of variable "createElementNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(createElementNative));
+	}
+
+	function Ctor() {}
+
 	/**
 	 * The main function for `watJSON.fromWatJSON(obj, opt)` and `watJson.parse(str, opt)`.
 	 * @param  {any} obj
 	 * @param  {watJSON.Options} opt
-	 * @param  {Object=} context
 	 * @return {any}
 	 * @static
 	 * @private
 	 * @ignore
 	 */
-	var _fromWatJSON = function _fromWatJSON(obj, opt, context) {
+	function _fromWatJSON(obj, opt) {
 	  if (!Options(opt)) {
 	    throw new TypeError('Value of argument "opt" violates contract.\n\nExpected:\nOptions\n\nGot:\n' + _inspect(opt));
-	  }
-
-	  if (!(context instanceof Object || context == null)) {
-	    throw new TypeError('Value of argument "context" violates contract.\n\nExpected:\nObject | null\n\nGot:\n' + _inspect(context));
 	  }
 
 	  var result;
@@ -237,7 +314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new TypeError('Value of variable "length" violates contract.\n\nExpected:\nnumber\n\nGot:\n' + _inspect(length));
 	    }
 
-	    result = [];
+	    result = new Array();
 	    var value = void 0;
 	    for (var i = 0; i < length; i++) {
 	      value = _fromWatJSON(obj[i], opt);
@@ -253,9 +330,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        result = getIgnoredProp();
 	      }
-	    } else if (obj[watJSONConstants.extTypeMap.infinity]) {
-	      if (opt.extTypes.infinity) {
-	        result = Infinity;
+	    } else if (obj[watJSONConstants.extTypeMap.InfinityNative]) {
+	      if (opt.extTypes.InfinityNative) {
+	        result = InfinityNative;
 	      } else {
 	        result = getIgnoredProp();
 	      }
@@ -264,35 +341,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (opt.useFunctionAST) {
 	          result = escodegen.generate(obj[watJSONConstants.extTypeMap.func].ast, watJSONConstants.functionAst.options);
 	          result = result.substring('export default '.length);
-	          result = eval('[' + result + '][0]');
+	          result = evalNative('[' + result + '][0]');
 	        } else {
-	          result = eval('[' + obj[watJSONConstants.extTypeMap.func].str + '][0]');
+	          result = evalNative('[' + obj[watJSONConstants.extTypeMap.func].str + '][0]');
 	        }
 	      } else {
 	        result = getIgnoredProp();
 	      }
 	    } else if (obj[watJSONConstants.extTypeMap.nativeFunction]) {
 	      if (opt.extTypes.nativeFunction) {
-	        result = eval('[function () { console.warn("native function"); }][0]');
+	        result = evalNative('[function () { console.warn("native function"); }][0]');
 	      } else {
 	        result = getIgnoredProp();
 	      }
 	    } else if (obj[watJSONConstants.extTypeMap.date]) {
 	      if (opt.extTypes.date) {
 	        // TODO : implement
-	        result = eval(obj[watJSONConstants.extTypeMap.date]);
+	        result = evalNative(obj[watJSONConstants.extTypeMap.date]);
 	      } else {
 	        result = getIgnoredProp();
 	      }
 	    } else if (obj[watJSONConstants.extTypeMap.regexp]) {
 	      if (opt.extTypes.regexp) {
-	        result = eval(obj[watJSONConstants.extTypeMap.regexp]);
+	        result = evalNative(obj[watJSONConstants.extTypeMap.regexp]);
 	      } else {
 	        result = getIgnoredProp();
 	      }
 	    } else if (obj[watJSONConstants.extTypeMap.undef]) {
 	      if (opt.extTypes.undef) {
-	        result = undefined;
+	        result = undefinedNative;
 	      } else {
 	        result = getIgnoredProp();
 	      }
@@ -301,12 +378,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (opt.useWatDomJSON) {
 	          result = watDomJSON.toDOM(obj[watJSONConstants.extTypeMap.htmlElement], watJSONConstants.watDomJSON.options.fromWatJSON).children[0];
 	        } else if (win) {
-	          result = win.document.createElement('div');
+	          result = createElementNative('div');
 	          result.innerHTML = obj[watJSONConstants.extTypeMap.htmlElement];
 	          result = result.firstChild;
 	          result.parentElement.removeChild(result);
 	        } else if (opt.extTypes.errorObject) {
-	          result = {};
+	          result = new Ctor();
 	          result[watJSONConstants.extTypeMap.errorObject] = _toWatJSON(new Error('Could not get windows global object.', watJSONConstants.defOptions));
 	        } else {
 	          result = getIgnoredProp();
@@ -328,7 +405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (opt.useWatDomJSON) {
 	            result[_i] = watDomJSON.toDOM(obj[watJSONConstants.extTypeMap.htmlCollection][_i], watJSONConstants.watDomJSON.options.fromWatJSON).children[0];
 	          } else if (win) {
-	            result[_i] = win.document.createElement('div');
+	            result[_i] = createElementNative('div');
 	            result[_i].innerHTML = obj[watJSONConstants.extTypeMap.htmlCollection][_i];
 	            result[_i] = result[_i].firstChild;
 	            result[_i].parentElement.removeChild(result[_i]);
@@ -344,11 +421,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return getIgnoredProp();
 	    } else if (obj[watJSONConstants.extTypeMap.errorObject]) {
 	      return commonUtils.clone(obj);
-
 	      // Handle root prototype.
 	    } else if (obj[watJSONConstants.extTypeMap.rootPrototype]) {
 	        if (opt.extTypes.rootPrototype) {
-	          result = Object.prototype;
+	          result = objectPrototypeNative;
 	        } else {
 	          return getIgnoredProp();
 	        }
@@ -357,23 +433,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (obj[watJSONConstants.extTypeMap.proto]) {
 	          if (opt.extTypes.proto) {
 	            result = new (function () {
-	              var object = function object() {};
+	              var object = new Ctor();
 
 	              if (!(typeof object === 'function')) {
 	                throw new TypeError('Value of variable "object" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(object));
 	              }
 
-	              object.prototype = _fromWatJSON(obj[watJSONConstants.extTypeMap.proto], opt);
+	              objectPrototypeNative = _fromWatJSON(obj[watJSONConstants.extTypeMap.proto], opt);
+
+	              if (!(objectPrototypeNative instanceof Object)) {
+	                throw new TypeError('Value of variable "objectPrototypeNative" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(objectPrototypeNative));
+	              }
+
 	              return object;
 	            }())();
 	          } else {
-	            result = {};
+	            result = new Ctor();
 	          }
 	        } else {
-	          result = {};
+	          result = new Ctor();
 	        }
 
-	        var keyList = Object.getOwnPropertyNames(obj);
+	        var keyList = getOwnPropertyNamesNative(obj);
 
 	        if (!Array.isArray(keyList)) {
 	          throw new TypeError('Value of variable "keyList" violates contract.\n\nExpected:\nArray\n\nGot:\n' + _inspect(keyList));
@@ -398,7 +479,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          } else {
 	            value = _fromWatJSON(obj[key], opt);
 	          }
-
 	          if (!isIgnoredProp(value)) {
 	            unescapedKey = watJSONConstants.unescKeynameMap[key] || key;
 	            result[unescapedKey] = value;
@@ -408,23 +488,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  return result;
-	};
+	}
 
 	/**
 	 * the main function for `watJSON.toWatJSON(obj, opt)` and `watJson.stringify(obj, opt)`.
 	 * @param  {any} obj
 	 * @param  {watJSON.Options} opt
+	 * @param  {any=} prototype
 	 * @return {any}
 	 * @static
 	 * @private
 	 * @ignore
 	 */
-
-	if (!(typeof _fromWatJSON === 'function')) {
-	  throw new TypeError('Value of variable "_fromWatJSON" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(_fromWatJSON));
-	}
-
-	var _toWatJSON = function _toWatJSON(obj, opt) {
+	function _toWatJSON(obj, opt, prototype) {
 	  if (!Options(opt)) {
 	    throw new TypeError('Value of argument "opt" violates contract.\n\nExpected:\nOptions\n\nGot:\n' + _inspect(opt));
 	  }
@@ -442,7 +518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (dataType === 'string') {
 	    result = obj;
 	  } else if (dataType === 'number') {
-	    if (Number.isNaN(obj)) {
+	    if (inNaNNative(obj)) {
 	      if (opt.extTypes.nan) {
 	        extendedType = watJSONConstants.extTypeMap.nan;
 
@@ -454,9 +530,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return getIgnoredProp();
 	      }
-	    } else if (!Number.isFinite(obj)) {
-	      if (opt.extTypes.infinity) {
-	        extendedType = watJSONConstants.extTypeMap.infinity;
+	    } else if (!isFiniteNative(obj)) {
+	      if (opt.extTypes.InfinityNative) {
+	        extendedType = watJSONConstants.extTypeMap.InfinityNative;
 
 	        if (!(typeof extendedType === 'string' || extendedType == null)) {
 	          throw new TypeError('Value of variable "extendedType" violates contract.\n\nExpected:\nstring | null\n\nGot:\n' + _inspect(extendedType));
@@ -480,7 +556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new TypeError('Value of variable "length" violates contract.\n\nExpected:\nnumber\n\nGot:\n' + _inspect(length));
 	    }
 
-	    result = [];
+	    result = new Array();
 	    var value = void 0;
 	    for (var i = 0; i < length; i++) {
 	      value = _toWatJSON(obj[i], opt);
@@ -488,7 +564,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        result[result.length] = value;
 	      }
 	    }
-
 	    // Handle built-in objects.
 	  } else if (obj instanceof Function) {
 	      if (opt.extTypes.func) {
@@ -552,7 +627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return getIgnoredProp();
 	      }
-	    } else if (obj === undefined) {
+	    } else if (obj === undefinedNative) {
 	      if (opt.extTypes.undef) {
 	        extendedType = watJSONConstants.extTypeMap.undef;
 
@@ -564,7 +639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return getIgnoredProp();
 	      }
-	    } else if (win && win.HTMLElement && obj instanceof win.HTMLElement) {
+	    } else if (HTMLElementNative && obj instanceof HTMLElementNative) {
 	      if (opt.extTypes.htmlElement) {
 	        extendedType = watJSONConstants.extTypeMap.htmlElement;
 
@@ -580,7 +655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return getIgnoredProp();
 	      }
-	    } else if (win && win.HTMLCollection && obj instanceof win.HTMLCollection) {
+	    } else if (HTMLCollectionNative && obj instanceof HTMLCollectionNative) {
 	      if (opt.extTypes.htmlCollection) {
 	        extendedType = watJSONConstants.extTypeMap.htmlCollection;
 
@@ -605,9 +680,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return getIgnoredProp();
 	      }
-
+	    } else if (prototype && HTMLDocumentNative && obj instanceof HTMLDocumentNative) {
+	      return getIgnoredProp();
 	      // Handle root prototype.
-	    } else if (obj.isPrototypeOf && obj.isPrototypeOf(Object)) {
+	    } else if (prototype && prototype.isPrototypeOf && prototype.isPrototypeOf(Object)) {
 	        if (opt.extTypes.rootPrototype) {
 	          extendedType = watJSONConstants.extTypeMap.rootPrototype;
 
@@ -619,17 +695,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	          return getIgnoredProp();
 	        }
-
 	        // Handle object and prototype.
 	      } else if (dataType === 'object') {
-	          result = {};
-	          var keyList = Object.getOwnPropertyNames(obj);
+	          result = new Ctor();
+	          var keyList = getOwnPropertyNamesNative(prototype || obj);
 
 	          if (!Array.isArray(keyList)) {
 	            throw new TypeError('Value of variable "keyList" violates contract.\n\nExpected:\nArray\n\nGot:\n' + _inspect(keyList));
 	          }
 
-	          var _proto = Object.getPrototypeOf(obj);
+	          var _proto = getPrototypeOfNative(prototype || obj);
 	          var jsonProto = void 0;
 
 	          if (!(jsonProto instanceof Object || jsonProto == null)) {
@@ -638,7 +713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          if (_proto) {
 	            if (opt.extTypes.proto) {
-	              jsonProto = _toWatJSON(_proto, opt);
+	              jsonProto = _toWatJSON(obj, opt, _proto);
 
 	              if (!(jsonProto instanceof Object || jsonProto == null)) {
 	                throw new TypeError('Value of variable "jsonProto" violates contract.\n\nExpected:\nObject | null\n\nGot:\n' + _inspect(jsonProto));
@@ -666,12 +741,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                  value = _toWatJSON(obj[key], opt);
 	                } catch (e) {
 	                  if (opt.extTypes.errorObject) {
-	                    result = {};
-	                    result[watJSONConstants.extTypeMap.errorObject] = _toWatJSON(e, watJSONConstants.defOptions);
+	                    value = new Ctor();
+	                    value[watJSONConstants.extTypeMap.errorObject] = _toWatJSON(e, watJSONConstants.defOptions);
 	                  }
 	                }
 	              }
-
 	              if (!isIgnoredProp(value)) {
 	                escapedKey = watJSONConstants.escKeynameMap[key] || key;
 	                result[escapedKey] = value;
@@ -695,15 +769,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return getIgnoredProp();
 	          }
 	        }
-
 	  if (extendedType) {
 	    var tempResult = result;
-	    result = {};
+	    result = new Ctor();
 	    result[extendedType] = tempResult;
 	  }
 
 	  return result;
-	};
+	}
 
 	/**
 	 * Create an object that means 'ignore converting this value'.
@@ -712,16 +785,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @private
 	 * @ignore
 	 */
+	function getIgnoredProp() {
+	  var result = new Ctor();
 
-	if (!(typeof _toWatJSON === 'function')) {
-	  throw new TypeError('Value of variable "_toWatJSON" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(_toWatJSON));
-	}
+	  if (!(result instanceof Object)) {
+	    throw new TypeError('Value of variable "result" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(result));
+	  }
 
-	var getIgnoredProp = function getIgnoredProp() {
-	  var result = {};
 	  result[watJSONConstants.extTypeMap.ignoredProp] = true;
 	  return result;
-	};
+	}
 
 	/**
 	 * Return `true` if 'val' is the returned value from `watJSON.getIgnoredProp()`
@@ -731,9 +804,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @private
 	 * @ignore
 	 */
-	var isIgnoredProp = function isIgnoredProp(val) {
+	function isIgnoredProp(val) {
 	  return !!(val && val[watJSONConstants.extTypeMap.ignoredProp]);
-	};
+	}
 	/* private methods - end */
 
 	/* public methods - begin */
@@ -746,13 +819,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {watJSON.WatJSONObject} converted watJSON object.
 	 * @static
 	 */
-	var toWatJSON = function toWatJSON(obj, options) {
-	  function _ref6(_id6) {
-	    if (!WatJSONObject(_id6)) {
-	      throw new TypeError('Function return value violates contract.\n\nExpected:\nWatJSONObject\n\nGot:\n' + _inspect(_id6));
+	function toWatJSON(obj, options) {
+	  function _ref7(_id7) {
+	    if (!WatJSONObject(_id7)) {
+	      throw new TypeError('Function "toWatJSON" return value violates contract.\n\nExpected:\nWatJSONObject\n\nGot:\n' + _inspect(_id7));
 	    }
 
-	    return _id6;
+	    return _id7;
 	  }
 
 	  if (!(options === undefined || Options(options))) {
@@ -777,47 +850,52 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var rawResult = _toWatJSON(obj, opt);
 	  var dataType = typeof rawResult === 'undefined' ? 'undefined' : _typeof(rawResult);
+	  var extTypeMap = watJSONConstants.extTypeMap;
+
+	  if (!(extTypeMap instanceof Object)) {
+	    throw new TypeError('Value of variable "extTypeMap" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(extTypeMap));
+	  }
 
 	  if (dataType === 'string') {
-	    result = {};
+	    result = new Ctor();
 
 	    if (!(WatJSONObject(result) || result == null)) {
 	      throw new TypeError('Value of variable "result" violates contract.\n\nExpected:\nWatJSONObject | null\n\nGot:\n' + _inspect(result));
 	    }
 
-	    result[watJSONConstants.extTypeMap.string] = rawResult;
+	    result[extTypeMap.string] = rawResult;
 	  } else if (dataType === 'number') {
-	    result = {};
+	    result = new Ctor();
 
 	    if (!(WatJSONObject(result) || result == null)) {
 	      throw new TypeError('Value of variable "result" violates contract.\n\nExpected:\nWatJSONObject | null\n\nGot:\n' + _inspect(result));
 	    }
 
-	    result[watJSONConstants.extTypeMap.number] = rawResult;
+	    result[extTypeMap.number] = rawResult;
 	  } else if (dataType === 'boolean') {
-	    result = {};
+	    result = new Ctor();
 
 	    if (!(WatJSONObject(result) || result == null)) {
 	      throw new TypeError('Value of variable "result" violates contract.\n\nExpected:\nWatJSONObject | null\n\nGot:\n' + _inspect(result));
 	    }
 
-	    result[watJSONConstants.extTypeMap.bool] = rawResult;
+	    result[extTypeMap.bool] = rawResult;
 	  } else if (obj === null) {
-	    result = {};
+	    result = new Ctor();
 
 	    if (!(WatJSONObject(result) || result == null)) {
 	      throw new TypeError('Value of variable "result" violates contract.\n\nExpected:\nWatJSONObject | null\n\nGot:\n' + _inspect(result));
 	    }
 
-	    result[watJSONConstants.extTypeMap.nul] = rawResult;
+	    result[extTypeMap.nul] = rawResult;
 	  } else if (obj instanceof Array) {
-	    result = {};
+	    result = new Ctor();
 
 	    if (!(WatJSONObject(result) || result == null)) {
 	      throw new TypeError('Value of variable "result" violates contract.\n\nExpected:\nWatJSONObject | null\n\nGot:\n' + _inspect(result));
 	    }
 
-	    result[watJSONConstants.extTypeMap.array] = rawResult;
+	    result[extTypeMap.array] = rawResult;
 	  } else {
 	    result = rawResult;
 
@@ -826,8 +904,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  return _ref6(result);
-	};
+	  return _ref7(result);
+	}
 
 	/**
 	 * Convert an watJSON an object to an original object.
@@ -836,7 +914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {any} converted original object.
 	 * @static
 	 */
-	var fromWatJSON = function fromWatJSON(obj, options) {
+	function fromWatJSON(obj, options) {
 	  if (!WatJSONObject(obj)) {
 	    throw new TypeError('Value of argument "obj" violates contract.\n\nExpected:\nWatJSONObject\n\nGot:\n' + _inspect(obj));
 	  }
@@ -856,22 +934,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  var object;
-	  if (obj[watJSONConstants.extTypeMap.string] !== undefined) {
-	    object = obj[watJSONConstants.extTypeMap.string];
-	  } else if (obj[watJSONConstants.extTypeMap.number] !== undefined) {
-	    object = obj[watJSONConstants.extTypeMap.number];
-	  } else if (obj[watJSONConstants.extTypeMap.bool] !== undefined) {
-	    object = obj[watJSONConstants.extTypeMap.bool];
-	  } else if (obj[watJSONConstants.extTypeMap.nul] !== undefined) {
-	    object = obj[watJSONConstants.extTypeMap.nul];
-	  } else if (obj[watJSONConstants.extTypeMap.array] !== undefined) {
-	    object = obj[watJSONConstants.extTypeMap.array];
+	  var extTypeMap = watJSONConstants.extTypeMap;
+
+	  if (!(extTypeMap instanceof Object)) {
+	    throw new TypeError('Value of variable "extTypeMap" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(extTypeMap));
+	  }
+
+	  if (obj[extTypeMap.string] !== undefinedNative) {
+	    object = obj[extTypeMap.string];
+	  } else if (obj[extTypeMap.number] !== undefinedNative) {
+	    object = obj[extTypeMap.number];
+	  } else if (obj[extTypeMap.bool] !== undefinedNative) {
+	    object = obj[extTypeMap.bool];
+	  } else if (obj[extTypeMap.nul] !== undefinedNative) {
+	    object = obj[extTypeMap.nul];
+	  } else if (obj[extTypeMap.array] !== undefinedNative) {
+	    object = obj[extTypeMap.array];
 	  } else {
 	    object = obj;
 	  }
 
 	  return _fromWatJSON(object, opt);
-	};
+	}
 	/* public methods - end */
 
 	/* export module - begin */
@@ -7869,12 +7953,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/**
 	 * watDomJSON.js: watDomJSON is forked from domJSON v0.1.2 for watJSON.
-	 * It supports parsing SVG Documents / Content Document.
+	 * It supports parsing SVG Documents / Content Documents.
 	 * It also contains several bug fixes.
 	 *
 	 * @file
 	 * @module watDomJSON
-	 * @version 0.1.0
+	 * @version 0.1.2
 	 * @author Jae-Yeop Kim <kseo05com@gmail.com>
 	 * @license MIT
 	 * @copyright (c) web-uhee.com 2016
@@ -8872,7 +8956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    useFunctionAST: false
 	  },
 	  escKeynameMap: {
-	    'constructor': '__CONSTRUCTOR__'
+	    'constructor': '@@CONSTRUCTOR@@'
 	  },
 	  unescKeynameMap: {}, // initialize dynamically.
 	  extTypeMap: {
@@ -8896,7 +8980,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    unknownObject: '__UNKNOWN__',
 	    errorObject: '__ERROR__',
 	    ignoredProp: '__IGNOREDPROP__',
-	    constructorFunc: '__CONSTRUCTOR__'
+
+	    constructorFunc: '@@CONSTRUCTOR@@',
+
+	    objectMap: '__OBJECTMAP__',
+	    objectID: '__OBJECTID__'
 	  },
 	  watDomJSON: {
 	    options: {
@@ -8911,17 +8999,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  },
-	  // stringify: {
-	  //   metadata: false,
-	  //   stringify: true,
-	  // },
-	  // parse: {
-	  //   metadata: false,
-	  //   noMeta: true,
-	  //   stringify: true,
-	  // },
 	  functionAst: {
-	    options: { sourceType: 'module' }
+	    options: {
+	      sourceType: 'module'
+	    }
 	  }
 	};
 

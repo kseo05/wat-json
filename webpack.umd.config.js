@@ -17,7 +17,7 @@ var webpackConfig = {
   module: {
     preLoaders: [
       {
-        loader: 'eslint-loader',
+        loaders: ['eslint-loader'],
         test: /\.js$/,
         excludes: [/node_modules/],
       },

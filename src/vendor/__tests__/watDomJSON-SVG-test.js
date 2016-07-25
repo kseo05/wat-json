@@ -1,3 +1,5 @@
+'use strict';
+
 describe('watDomJSON.toJSON(svgObj);', () => {
   var originalTimeout;
 

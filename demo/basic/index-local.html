@@ -4,9 +4,13 @@
   <meta charset="utf-8" />
 </head>
 <body>
+  <div class='ui'>
+    <button id='btn-toWatJSON-document'>result.document = watJSON.toWatJSON(document);</button>
+    <button id='btn-toWatJSON-body'>result.body = watJSON.toWatJSON(document.body);</button>
+  </div>
   <div class='container'>
     <span id='username'>1234</span>
-    <button id='button' class='btn-test' style='width:30px;height:20px'></button>
+    <button id='d-btn-test' class='btn-test' style='width:30px;height:20px'>button</button>
     <iframe id='iframe' src="./iframe.html">
       Failed to load iframe.
     </iframe>
@@ -29,48 +33,33 @@
   <script type="text/javascript" src="http://localhost:3333/watJSON.browser.js"></script>
   <script>
   $(function() {
+    var toWatJSONOptions = {
+      extTypes: {
+        undef: true,
+        nan: true,
+        infinity: true,
+        date: true,
+        regexp: true,
+        func: true,
+        constructorFunc: true,
+        functionValue: true,
+        nativeFunction: true,
+        htmlElement: true,
+        htmlCollection: true,
+        proto: true,
+        rootPrototype: true,
+        unknownObject: true,
+        errorObject: true,
+      },
+      useWatDomJSON: true,
+      useFunctionAST: true,
+    };
     window.result = {};
-    window.result.document = watJSON.toWatJSON(document, {
-      extTypes: {
-        undef: true,
-        nan: true,
-        infinity: true,
-        date: true,
-        regexp: true,
-        func: true,
-        constructorFunc: true,
-        functionValue: true,
-        nativeFunction: true,
-        htmlElement: true,
-        htmlCollection: true,
-        proto: true,
-        rootPrototype: true,
-        unknownObject: true,
-        errorObject: true,
-      },
-      useWatDomJSON: true,
-      useFunctionAST: true,
+    $("#btn-toWatJSON-document").on('click', function () {
+      window.result.document = watJSON.toWatJSON(document, toWatJSONOptions);
     });
-    window.result.body = watJSON.toWatJSON(document.body, {
-      extTypes: {
-        undef: true,
-        nan: true,
-        infinity: true,
-        date: true,
-        regexp: true,
-        func: true,
-        constructorFunc: true,
-        functionValue: true,
-        nativeFunction: true,
-        htmlElement: true,
-        htmlCollection: true,
-        proto: true,
-        rootPrototype: true,
-        unknownObject: true,
-        errorObject: true,
-      },
-      useWatDomJSON: true,
-      useFunctionAST: true,
+    $("#btn-toWatJSON-body").on('click', function () {
+      window.result.body = watJSON.toWatJSON(document.body, toWatJSONOptions);
     });
     // window.result.model = 0;
   });

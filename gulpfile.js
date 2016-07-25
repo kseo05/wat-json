@@ -14,29 +14,28 @@ var webpackDevServerConfig = require('./webpack.browser.devserver.config');
 var path = require('path');
 
 var paths = {
-  'src': [
+  src: [
     'src/watJSON.js',
   ],
-  'dist': [
+  dist: [
     'dist/*',
   ],
-  'docs': {
-    'badges': './docs/badges.md',
-    'api': './docs/api.md',
-    'install': './docs/install.md',
-    'examples': './docs/examples.md',
-    'license': './LICENSE.md',
-    'readme': 'README.md',
-    'dest': './docs',
+  docs: {
+    badges: './docs/badges.md',
+    api: './docs/api.md',
+    install: './docs/install.md',
+    examples: './docs/examples.md',
+    license: './LICENSE.md',
+    readme: 'README.md',
+    dest: './docs',
   },
-  'config': {
-    'umdBuild': 'webpack.umd.config.js',
-    'umdBuildeMin': 'webpack.umd.min.config.js',
-    'browserBuild': 'webpack.browser.config.js',
-    'browserBuildeMin': 'webpack.browser.min.config.js',
-    'devserver': './webpack.devserver.config',
+  config: {
+    umdBuild: 'webpack.umd.config.js',
+    umdBuildeMin: 'webpack.umd.min.config.js',
+    browserBuild: 'webpack.browser.config.js',
+    browserBuildeMin: 'webpack.browser.min.config.js',
   },
-}
+};
 
 // Clean tasks.
 gulp.task('clean', function () {

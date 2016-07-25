@@ -23,9 +23,9 @@ sample.toWatJSON.JSONObject.default = {
 sample.toWatJSON.JSONObject.available = JSON.parse(JSON.stringify(sample.toWatJSON.JSONObject.default));
 sample.toWatJSON.JSONObject.minimized = JSON.parse(JSON.stringify(sample.toWatJSON.JSONObject.default));
 sample.toWatJSON.inst.default = (function () {
-  var Clazz = function () {};
+  var Ctor = function () {};
 
-  var inst = new Clazz();
+  var inst = new Ctor();
 
   inst.str = 'Hello';
   inst.undef = undefined;
@@ -37,7 +37,7 @@ sample.toWatJSON.inst.default = (function () {
   return inst;
 })();
 sample.toWatJSON.inst.available = (function () {
-  var Clazz = function () {
+  var Ctor = function () {
     this.str = 'Hello';
     this.undef = undefined;
     this.nan = NaN;
@@ -51,17 +51,17 @@ sample.toWatJSON.inst.available = (function () {
     };
   };
 
-  Clazz.prototype.func = function () {
+  Ctor.prototype.func = function () {
     this.str = 'Hello Function';
   }
 
-  return new Clazz();
+  return new Ctor();
 })();
 sample.toWatJSON.inst.minimized = {
   'str': 'Hello',
 };
 sample.toWatJSON.classInst.default = (function () {
-  class Clazz {}
+  class Clazz {};
 
   var inst = new Clazz();
 
@@ -276,7 +276,7 @@ sample.fromWatJSON.inst.available = {
     },
   },
   '__PROTO__':{
-    '__CONSTRUCTOR__':{
+    '@@CONSTRUCTOR@@':{
       '__FUNCTION__':{
         'ast': {
           'type': 'Program',
@@ -742,7 +742,7 @@ sample.fromWatJSON.classInst.available = {
     },
   },
   '__PROTO__':{
-    '__CONSTRUCTOR__':{
+    '@@CONSTRUCTOR@@':{
       '__FUNCTION__':{
         'ast': {
           'type': 'Program',
