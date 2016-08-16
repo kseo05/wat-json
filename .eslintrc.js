@@ -47,11 +47,15 @@ module.exports = {
     'quotes': [ERROR, 'single', 'avoid-escape'],
     'space-before-blocks': ERROR,
     'space-before-function-paren': [ERROR, 'always'],
+    'flowtype/define-flow-type': OFF,
     'flowtype/require-parameter-type': WARNING,
     'flowtype/require-return-type': [WARNING, 'always', {'annotateUndefined': 'never'} ],
+    'flowtype/require-valid-file-annotation': [WARNING, 'always'],
     'flowtype/space-after-type-colon': [WARNING, 'always'],
     'flowtype/space-before-type-colon': [WARNING, 'never'],
     'flowtype/type-id-match': [WARNING, "^([A-Z][a-z0-9]*)+$"],
+    // 'flowtype/use-flow-type' WARNING,
+    // 'flowtype/valid-syntax': WARNING,
   },
   settings: {
     flowtype: {

@@ -3,7 +3,7 @@
 describe('watDomJSON.toJSON(svgObj);', () => {
   var originalTimeout;
 
-  beforeEach(function() {
+  beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
   });
@@ -70,7 +70,9 @@ describe('watDomJSON.toDOM(svgObj);', () => {
       child = childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
         child.kill();
         if (!err) {
-          console.log(`stdout = ${stdout}`);
+          if (stdout && stdout.toString && stdout.toString()) {
+            console.log(`stdout = ${stdout}`);
+          }
           done();
         } else {
           console.log(`err = ${err}`);

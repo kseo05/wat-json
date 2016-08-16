@@ -26,7 +26,7 @@ var watJSONConstants = {
     useFunctionAST: false,
   },
   escKeynameMap: {
-    'constructor': '@@CONSTRUCTOR@@',
+    'constructor': '$$CONSTRUCTOR$$',
   },
   unescKeynameMap: {},  // initialize dynamically.
   extTypeMap: {
@@ -51,10 +51,10 @@ var watJSONConstants = {
     errorObject: '__ERROR__',
     ignoredProp: '__IGNOREDPROP__',
 
-    constructorFunc: '@@CONSTRUCTOR@@',
+    constructorFunc: '$$CONSTRUCTOR$$',
 
-    objectMap: '__OBJECTMAP__',
-    objectID: '__OBJECTID__',
+    objectAlias: '__OBJALIAS__',
+    objLink: '__OBJLINK__',
   },
   watDomJSON: {
     options: {

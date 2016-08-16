@@ -6,7 +6,7 @@ const Constants = require('../../__tests__/Constants');
 describe('watDomJSON.toJSON(obj);', () => {
   it('일반 HTML Element 를 전달인자로 실행했을 때, 기대된 형태의 JSON Object 를 반환해야 한다.', () => {
     const $ = require('jquery');
-    const watDomJSON = require('../watDomJSON');
+    const watDomJSON = require('../WatDomJSON');
 
     document.body.innerHTML = Constants.sample.bodyString;
 
@@ -34,7 +34,7 @@ describe('watDomJSON.toJSON(obj);', () => {
 describe('watDomJSON.toDOM(obj);', () => {
   it('일반 HTML Element 의 JSON Object 를 전달인자로 실행했을 때, 기대된 형태의 HTML Element 를 반환해야 한다.', () => {
     const $ = require('jquery');
-    const watDomJSON = require('../watDomJSON');
+    const watDomJSON = require('../WatDomJSON');
 
     document.body.innerHTML = Constants.sample.bodyString;
 

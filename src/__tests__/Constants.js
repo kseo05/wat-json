@@ -2,11 +2,6 @@
 
 var sample = {};
 sample.toWatJSON = {};
-sample.toWatJSON.string = 'string';
-sample.toWatJSON.number = 123;
-sample.toWatJSON.bool = true;
-sample.toWatJSON.nul = null;
-sample.toWatJSON.array = [ 1,2,3 ];
 sample.toWatJSON.JSONObject = {};
 sample.toWatJSON.inst = {};
 sample.toWatJSON.classInst = {};
@@ -102,21 +97,6 @@ sample.toWatJSON.classInst.minimized = {
 };
 
 sample.fromWatJSON = {};
-sample.fromWatJSON.string = {
-  '__STRING__': 'string',
-};
-sample.fromWatJSON.number = {
-  '__NUMBER__': 123,
-};
-sample.fromWatJSON.bool = {
-  '__BOOLEAN__': true,
-};
-sample.fromWatJSON.nul = {
-  '__NULL__': null,
-};
-sample.fromWatJSON.array = {
-  '__ARRAY__': [ 1,2,3 ],
-};
 sample.fromWatJSON.JSONObject = {};
 sample.fromWatJSON.inst = {};
 sample.fromWatJSON.classInst = {};
@@ -276,7 +256,7 @@ sample.fromWatJSON.inst.available = {
     },
   },
   '__PROTO__':{
-    '@@CONSTRUCTOR@@':{
+    '$$CONSTRUCTOR$$':{
       '__FUNCTION__':{
         'ast': {
           'type': 'Program',
@@ -742,7 +722,7 @@ sample.fromWatJSON.classInst.available = {
     },
   },
   '__PROTO__':{
-    '@@CONSTRUCTOR@@':{
+    '$$CONSTRUCTOR$$':{
       '__FUNCTION__':{
         'ast': {
           'type': 'Program',

@@ -65,7 +65,7 @@ Common converting options.
 | extTypes | <code>Object</code> |  | Options about converting objects which JSON global object cannot convert. |
 | extTypes.undef | <code>boolean</code> | <code>true</code> | Use `true` if you wanna convert `undefined` objects. |
 | extTypes.nan | <code>boolean</code> | <code>true</code> | Use `true` if you wanna convert `NaN` objects. |
-| extTypes.InfinityNative | <code>boolean</code> | <code>true</code> | Use `true` if you wanna convert `InfinityNative` objects. |
+| extTypes.infinity | <code>boolean</code> | <code>true</code> | Use `true` if you wanna convert `infinity` objects. |
 | extTypes.func | <code>boolean</code> | <code>false</code> | Use `true` if you wanna convert function objects. |
 | extTypes.constructorFunc | <code>boolean</code> | <code>false</code> | Use `true` if you wanna convert the `constructor` of instances. |
 | extTypes.functionValue | <code>boolean</code> | <code>false</code> | Use `true` if you wanna convert between the `function` source code and a string when converting function objects. |

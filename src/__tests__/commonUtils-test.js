@@ -1,6 +1,15 @@
 'use strict';
 
-const commonUtils = require('../commonUtils');
+const commonUtils = require('../CommonUtils');
+
+describe('new commonUtils.Ctor();', () => {
+  it('Javascript object constructor 로의 기능이 올바르게 동작해야 한다.', () => {
+    const Ctor = commonUtils.Ctor;
+    var obj = new Ctor();
+    expect(typeof obj).toEqual('object');
+    expect(obj instanceof Object).toBeTruthy();
+  });
+});
 
 describe('commonUtils.extend(target, ...sources);', () => {
   var target, source1, source2;

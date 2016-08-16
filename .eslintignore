@@ -2,6 +2,6 @@
 
 dist/**
 coverage/**
-src/vendor/**
+src/vendor/watDomJSON.js
 
 **/_learn_.*

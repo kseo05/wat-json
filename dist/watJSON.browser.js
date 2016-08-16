@@ -73,8 +73,9 @@ var watJSON =
 	  var acorn = __webpack_require__(2);
 	  var escodegen = __webpack_require__(3);
 	  var watDomJSON = __webpack_require__(22);
-	  var commonUtils = __webpack_require__(23);
-	  var watJSONConstants = __webpack_require__(24);
+	  var Stack = __webpack_require__(23);
+	  var commonUtils = __webpack_require__(24);
+	  var watJSONConstants = __webpack_require__(25);
 	  /* import modules - end */
 
 	  /* define custom object type - begin */
@@ -153,7 +154,7 @@ var watJSON =
 	   * @property {Object} extTypes Options about converting objects which JSON global object cannot convert.
 	   * @property {boolean} extTypes.undef=true Use `true` if you wanna convert `undefined` objects.
 	   * @property {boolean} extTypes.nan=true Use `true` if you wanna convert `NaN` objects.
-	   * @property {boolean} extTypes.InfinityNative=true Use `true` if you wanna convert `InfinityNative` objects.
+	   * @property {boolean} extTypes.infinity=true Use `true` if you wanna convert `infinity` objects.
 	   * @property {boolean} extTypes.func=false Use `true` if you wanna convert function objects.
 	   * @property {boolean} extTypes.constructorFunc=false Use `true` if you wanna convert the `constructor` of instances.
 	   * @property {boolean} extTypes.functionValue=false Use `true` if you wanna convert between the `function` source code and a string when converting function objects.
@@ -172,7 +173,7 @@ var watJSON =
 
 	  var Options = function () {
 	    function Options(input) {
-	      return input != null && input.extTypes != null && typeof input.extTypes.undef === 'boolean' && typeof input.extTypes.nan === 'boolean' && typeof input.extTypes.InfinityNative === 'boolean' && typeof input.extTypes.func === 'boolean' && typeof input.extTypes.constructorFunc === 'boolean' && typeof input.extTypes.functionValue === 'boolean' && typeof input.extTypes.nativeFunction === 'boolean' && typeof input.extTypes.htmlElement === 'boolean' && typeof input.extTypes.htmlCollection === 'boolean' && typeof input.extTypes.proto === 'boolean' && typeof input.extTypes.rootPrototype === 'boolean' && typeof input.extTypes.unknownObject === 'boolean' && typeof input.extTypes.errorObject === 'boolean' && typeof input.useWatDomJSON === 'boolean' && typeof input.useFunctionAST === 'boolean';
+	      return input != null && input.extTypes != null && typeof input.extTypes.undef === 'boolean' && typeof input.extTypes.nan === 'boolean' && typeof input.extTypes.infinity === 'boolean' && typeof input.extTypes.func === 'boolean' && typeof input.extTypes.constructorFunc === 'boolean' && typeof input.extTypes.functionValue === 'boolean' && typeof input.extTypes.nativeFunction === 'boolean' && typeof input.extTypes.htmlElement === 'boolean' && typeof input.extTypes.htmlCollection === 'boolean' && typeof input.extTypes.proto === 'boolean' && typeof input.extTypes.rootPrototype === 'boolean' && typeof input.extTypes.unknownObject === 'boolean' && typeof input.extTypes.errorObject === 'boolean' && typeof input.useWatDomJSON === 'boolean' && typeof input.useFunctionAST === 'boolean';
 	    }
 
 	    ;
@@ -189,11 +190,6 @@ var watJSON =
 
 
 	  var objectPrototypeNative = Object.prototype;
-
-	  if (!(objectPrototypeNative instanceof Object)) {
-	    throw new TypeError('Value of variable "objectPrototypeNative" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(objectPrototypeNative));
-	  }
-
 	  var InfinityNative = Infinity;
 	  var undefinedNative = undefined;
 
@@ -237,31 +233,31 @@ var watJSON =
 	    throw new TypeError('Value of variable "getPrototypeOfNative" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(getPrototypeOfNative));
 	  }
 
-	  var win = window || null; // eslint-disable-line no-undef
+	  var windowNative = window || null; // eslint-disable-line no-undef
 
-	  if (!(win instanceof Object || win == null)) {
-	    throw new TypeError('Value of variable "win" violates contract.\n\nExpected:\nObject | null\n\nGot:\n' + _inspect(win));
+	  if (!(windowNative instanceof Object || windowNative == null)) {
+	    throw new TypeError('Value of variable "windowNative" violates contract.\n\nExpected:\nObject | null\n\nGot:\n' + _inspect(windowNative));
 	  }
 
-	  var HTMLDocumentNative = win ? win.HTMLDocumentNative : null;
+	  var HTMLDocumentNative = windowNative ? windowNative.HTMLDocument : null;
 
 	  if (!(typeof HTMLDocumentNative === 'function' || HTMLDocumentNative == null)) {
 	    throw new TypeError('Value of variable "HTMLDocumentNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(HTMLDocumentNative));
 	  }
 
-	  var HTMLCollectionNative = win ? win.HTMLCollection : null;
+	  var HTMLCollectionNative = windowNative ? windowNative.HTMLCollection : null;
 
 	  if (!(typeof HTMLCollectionNative === 'function' || HTMLCollectionNative == null)) {
 	    throw new TypeError('Value of variable "HTMLCollectionNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(HTMLCollectionNative));
 	  }
 
-	  var HTMLElementNative = win ? win.HTMLElement : null;
+	  var HTMLElementNative = windowNative ? windowNative.HTMLElement : null;
 
 	  if (!(typeof HTMLElementNative === 'function' || HTMLElementNative == null)) {
 	    throw new TypeError('Value of variable "HTMLElementNative" violates contract.\n\nExpected:\nFunction | null\n\nGot:\n' + _inspect(HTMLElementNative));
 	  }
 
-	  var createElementNative = win ? win.document.createElement : null;
+	  var createElementNative = windowNative ? windowNative.document.createElement : null;
 
 	  /**
 	   * Javascript object constructor.
@@ -324,8 +320,8 @@ var watJSON =
 	        } else {
 	          result = getIgnoredProp();
 	        }
-	      } else if (obj[watJSONConstants.extTypeMap.InfinityNative]) {
-	        if (opt.extTypes.InfinityNative) {
+	      } else if (obj[watJSONConstants.extTypeMap.infinity]) {
+	        if (opt.extTypes.infinity) {
 	          result = InfinityNative;
 	        } else {
 	          result = getIgnoredProp();
@@ -371,7 +367,7 @@ var watJSON =
 	        if (opt.extTypes.htmlElement) {
 	          if (opt.useWatDomJSON) {
 	            result = watDomJSON.toDOM(obj[watJSONConstants.extTypeMap.htmlElement], watJSONConstants.watDomJSON.options.fromWatJSON).children[0];
-	          } else if (win) {
+	          } else if (windowNative) {
 	            result = createElementNative('div');
 	            result.innerHTML = obj[watJSONConstants.extTypeMap.htmlElement];
 	            result = result.firstChild;
@@ -398,7 +394,7 @@ var watJSON =
 	          for (var _i = 0; _i < _length; _i++) {
 	            if (opt.useWatDomJSON) {
 	              result[_i] = watDomJSON.toDOM(obj[watJSONConstants.extTypeMap.htmlCollection][_i], watJSONConstants.watDomJSON.options.fromWatJSON).children[0];
-	            } else if (win) {
+	            } else if (windowNative) {
 	              result[_i] = createElementNative('div');
 	              result[_i].innerHTML = obj[watJSONConstants.extTypeMap.htmlCollection][_i];
 	              result[_i] = result[_i].firstChild;
@@ -427,19 +423,22 @@ var watJSON =
 	          if (obj[watJSONConstants.extTypeMap.proto]) {
 	            if (opt.extTypes.proto) {
 	              result = new (function () {
+	                function _ref3(_id3) {
+	                  if (!(typeof _id3 === 'function')) {
+	                    throw new TypeError('Function return value violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(_id3));
+	                  }
+
+	                  return _id3;
+	                }
+
 	                var object = new Ctor();
 
-	                if (!(typeof object === 'function')) {
-	                  throw new TypeError('Value of variable "object" violates contract.\n\nExpected:\nFunction\n\nGot:\n' + _inspect(object));
+	                if (!(object instanceof Object)) {
+	                  throw new TypeError('Value of variable "object" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(object));
 	                }
 
 	                objectPrototypeNative = _fromWatJSON(obj[watJSONConstants.extTypeMap.proto], opt);
-
-	                if (!(objectPrototypeNative instanceof Object)) {
-	                  throw new TypeError('Value of variable "objectPrototypeNative" violates contract.\n\nExpected:\nObject\n\nGot:\n' + _inspect(objectPrototypeNative));
-	                }
-
-	                return object;
+	                return _ref3(object);
 	              }())();
 	            } else {
 	              result = new Ctor();
@@ -525,8 +524,8 @@ var watJSON =
 	          return getIgnoredProp();
 	        }
 	      } else if (!isFiniteNative(obj)) {
-	        if (opt.extTypes.InfinityNative) {
-	          extendedType = watJSONConstants.extTypeMap.InfinityNative;
+	        if (opt.extTypes.infinity) {
+	          extendedType = watJSONConstants.extTypeMap.infinity;
 
 	          if (!(typeof extendedType === 'string' || extendedType == null)) {
 	            throw new TypeError('Value of variable "extendedType" violates contract.\n\nExpected:\nstring | null\n\nGot:\n' + _inspect(extendedType));
@@ -8730,6 +8729,166 @@ var watJSON =
 /* 23 */
 /***/ function(module, exports) {
 
+	"use strict";
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * An implementation of stack data structure.
+	 * @file
+	 * @module watStack
+	 * @version 0.1.0
+	 * @author Jae-Yeop Kim <kseo05com@gmail.com>
+	 * @license MIT
+	 * @copyright (c) web-uhee.com 2016
+	 * @see {@link http://git.web-uhee.com/lib/watStack|watStack}
+	 */
+
+	var Stack = function () {
+	  /**
+	   * Stack instance constructor.
+	   */
+
+	  function Stack() {
+	    _classCallCheck(this, Stack);
+
+	    this.arr = new Array();
+	    this.length = 0;
+	  }
+
+	  /**
+	   * Push an item into the stack.
+	   * @param  {any} item An item to push.
+	   */
+
+
+	  _createClass(Stack, [{
+	    key: "push",
+	    value: function push(item) {
+	      this.arr[this.length] = item;
+	      this.length++;
+	    }
+
+	    /**
+	     * Remove and return the item at the top of the stack.
+	     * @return {any} The item at the top of the stack.
+	     */
+
+	  }, {
+	    key: "pop",
+	    value: function pop() {
+	      this.length--;
+	      return this.arr[this.length];
+	    }
+
+	    /**
+	     * Return the size of the stack.
+	     * @return {number} The size of the stack.
+	     */
+
+	  }, {
+	    key: "size",
+	    value: function size() {
+	      function _ref2(_id2) {
+	        if (!(typeof _id2 === 'number')) {
+	          throw new TypeError("Function return value violates contract.\n\nExpected:\nnumber\n\nGot:\n" + _inspect(_id2));
+	        }
+
+	        return _id2;
+	      }
+
+	      return _ref2(this.length);
+	    }
+	  }]);
+
+	  return Stack;
+	}();
+
+	;
+
+	module.exports = Stack;
+
+	function _inspect(input, depth) {
+	  var maxDepth = 4;
+	  var maxKeys = 15;
+
+	  if (depth === undefined) {
+	    depth = 0;
+	  }
+
+	  depth += 1;
+
+	  if (input === null) {
+	    return 'null';
+	  } else if (input === undefined) {
+	    return 'void';
+	  } else if (typeof input === 'string' || typeof input === 'number' || typeof input === 'boolean') {
+	    return typeof input === "undefined" ? "undefined" : _typeof(input);
+	  } else if (Array.isArray(input)) {
+	    if (input.length > 0) {
+	      var _ret = function () {
+	        if (depth > maxDepth) return {
+	            v: '[...]'
+	          };
+
+	        var first = _inspect(input[0], depth);
+
+	        if (input.every(function (item) {
+	          return _inspect(item, depth) === first;
+	        })) {
+	          return {
+	            v: first.trim() + '[]'
+	          };
+	        } else {
+	          return {
+	            v: '[' + input.slice(0, maxKeys).map(function (item) {
+	              return _inspect(item, depth);
+	            }).join(', ') + (input.length >= maxKeys ? ', ...' : '') + ']'
+	          };
+	        }
+	      }();
+
+	      if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+	    } else {
+	      return 'Array';
+	    }
+	  } else {
+	    var keys = Object.keys(input);
+
+	    if (!keys.length) {
+	      if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+	        return input.constructor.name;
+	      } else {
+	        return 'Object';
+	      }
+	    }
+
+	    if (depth > maxDepth) return '{...}';
+	    var indent = '  '.repeat(depth - 1);
+	    var entries = keys.slice(0, maxKeys).map(function (key) {
+	      return (/^([A-Z_$][A-Z0-9_$]*)$/i.test(key) ? key : JSON.stringify(key)) + ': ' + _inspect(input[key], depth) + ';';
+	    }).join('\n  ' + indent);
+
+	    if (keys.length >= maxKeys) {
+	      entries += '\n  ' + indent + '...';
+	    }
+
+	    if (input.constructor && input.constructor.name && input.constructor.name !== 'Object') {
+	      return input.constructor.name + ' {\n  ' + indent + entries + '\n' + indent + '}';
+	    } else {
+	      return '{\n  ' + indent + entries + '\n' + indent + '}';
+	    }
+	  }
+	}
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
 	'use strict';
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -8918,7 +9077,7 @@ var watJSON =
 	}
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -8951,7 +9110,7 @@ var watJSON =
 	    useFunctionAST: false
 	  },
 	  escKeynameMap: {
-	    'constructor': '@@CONSTRUCTOR@@'
+	    'constructor': '$$CONSTRUCTOR$$'
 	  },
 	  unescKeynameMap: {}, // initialize dynamically.
 	  extTypeMap: {
@@ -8976,10 +9135,10 @@ var watJSON =
 	    errorObject: '__ERROR__',
 	    ignoredProp: '__IGNOREDPROP__',
 
-	    constructorFunc: '@@CONSTRUCTOR@@',
+	    constructorFunc: '$$CONSTRUCTOR$$',
 
-	    objectMap: '__OBJECTMAP__',
-	    objectID: '__OBJECTID__'
+	    memoryMap: '__MEMMAP__',
+	    memoryAddress: '__MEMADDR__'
 	  },
 	  watDomJSON: {
 	    options: {

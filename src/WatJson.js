@@ -13,9 +13,11 @@
 /* import modules - begin */
 const acorn: any = require('acorn');
 const escodegen: any = require('escodegen');
-const watDomJSON: any = require('./vendor/watDomJSON');
-const commonUtils: any = require('./commonUtils');
-const watJSONConstants: any = require('./watJSONConstants');
+const watDomJSON: Object = require('./vendor/WatDomJSON');
+const commonUtils: Object = require('./CommonUtils');
+const watJSONConstants: Object = require('./WatJSONConstants');
+const WatJSONObjectPathManager: Function = require('./WatJSONObjectPathManager');
+const WatObjectReferenceManager: Function = require('./WatObjectReferenceManager');
 /* import modules - end */
 
 /* define custom object type - begin */
@@ -37,7 +39,7 @@ type JSONArray = Array<JSONValue>;
  * @property {Object} extTypes Options about converting objects which JSON global object cannot convert.
  * @property {boolean} extTypes.undef=true Use `true` if you wanna convert `undefined` objects.
  * @property {boolean} extTypes.nan=true Use `true` if you wanna convert `NaN` objects.
- * @property {boolean} extTypes.InfinityNative=true Use `true` if you wanna convert `InfinityNative` objects.
+ * @property {boolean} extTypes.infinity=true Use `true` if you wanna convert `infinity` objects.
  * @property {boolean} extTypes.func=false Use `true` if you wanna convert function objects.
  * @property {boolean} extTypes.constructorFunc=false Use `true` if you wanna convert the `constructor` of instances.
  * @property {boolean} extTypes.functionValue=false Use `true` if you wanna convert between the `function` source code and a string when converting function objects.
@@ -56,7 +58,7 @@ type Options = {
   extTypes: {
     undef: boolean,
     nan: boolean,
-    InfinityNative: boolean,
+    infinity: boolean,
     func: boolean,
     constructorFunc: boolean,
     functionValue: boolean,
@@ -71,10 +73,13 @@ type Options = {
   useWatDomJSON: boolean,
   useFunctionAST: boolean,
 };
+
+type WatJSONObjectPathManager = Object;
+type WatObjectReferenceManager = Object;
 /* define custom object type - end */
 
 /* private variables - begin */
-var objectPrototypeNative: Object = Object.prototype;
+var objectPrototypeNative: any = Object.prototype;
 var InfinityNative: number = Infinity;
 var undefinedNative: null = undefined;
 
@@ -100,191 +105,27 @@ var createElementNative: Function|null = windowNative ? windowNative.document.cr
  * @static
  * @ignore
  */
-function Ctor (): null {}
+var Ctor: Function = commonUtils.Ctor;
 
 /**
- * The main function for `watJSON.fromWatJSON(obj, opt)` and `watJson.parse(str, opt)`.
- * @param  {any} obj
- * @param  {watJSON.Options} opt
- * @return {any}
+ * JSON object path manager for watJSON to support javascript objects which contains self/circular references.
  * @static
- * @private
  * @ignore
  */
-function _fromWatJSON (obj: any, opt: Options): any {
-  var result: any;
-  var dataType: string = typeof obj;
+var objPathManager: WatJSONObjectPathManager = new WatJSONObjectPathManager();
 
-  // Handle JSON standard types without object type.
-  if (dataType === 'string') {
-    result = obj;
-  } else if (dataType === 'number') {
-    result = obj;
-  } else if (dataType === 'boolean') {
-    result = obj;
-  } else if (obj === null) {
-    result = null;
-  } else if (obj instanceof Array) {
-    const length: number = obj.length;
-    result = new Array();
-    let value: any;
-    for (let i: number = 0; i < length; i++) {
-      value = _fromWatJSON(obj[i], opt);
-      if (!isIgnoredProp(value)) {
-        result[result.length] = value;
-      }
-    }
-  } else { // dataType === 'object'
-    if (obj[watJSONConstants.extTypeMap.nan]) {
-      if (opt.extTypes.nan) {
-        result = NaN;
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.InfinityNative]) {
-      if (opt.extTypes.InfinityNative) {
-        result = InfinityNative;
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.func]) {
-      if (opt.extTypes.func) {
-        if (opt.useFunctionAST) {
-          result = escodegen.generate(obj[watJSONConstants.extTypeMap.func].ast, watJSONConstants.functionAst.options);
-          result = result.substring('export default '.length);
-          result = evalNative(`[${result}][0]`);
-        } else {
-          result = evalNative(`[${obj[watJSONConstants.extTypeMap.func].str}][0]`);
-        }
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.nativeFunction]) {
-      if (opt.extTypes.nativeFunction) {
-        result = evalNative('[function () { console.warn("native function"); }][0]');
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.date]) {
-      if (opt.extTypes.date) {
-        // TODO : implement
-        result = evalNative(obj[watJSONConstants.extTypeMap.date]);
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.regexp]) {
-      if (opt.extTypes.regexp) {
-        result = evalNative(obj[watJSONConstants.extTypeMap.regexp]);
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.undef]) {
-      if (opt.extTypes.undef) {
-        result = undefinedNative;
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.htmlElement]) {
-      if (opt.extTypes.htmlElement) {
-        if (opt.useWatDomJSON) {
-          result = watDomJSON.toDOM(
-            obj[watJSONConstants.extTypeMap.htmlElement],
-            watJSONConstants.watDomJSON.options.fromWatJSON
-          ).children[0];
-        } else if (windowNative) {
-          result = createElementNative('div');
-          result.innerHTML = obj[watJSONConstants.extTypeMap.htmlElement];
-          result = result.firstChild;
-          result.parentElement.removeChild(result);
-        } else if (opt.extTypes.errorObject) {
-          result = new Ctor();
-          result[watJSONConstants.extTypeMap.errorObject] = _toWatJSON(new Error('Could not get windows global object.', watJSONConstants.defOptions));
-        } else {
-          result = getIgnoredProp();
-        }
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.htmlCollection]) {
-      if (opt.extTypes.htmlCollection) {
-        const length: number = obj[watJSONConstants.extTypeMap.htmlCollection].length;
-        result = new Array(length);
-
-        for (let i: number = 0; i < length; i++) {
-          if (opt.useWatDomJSON) {
-            result[i] = watDomJSON.toDOM(
-              obj[watJSONConstants.extTypeMap.htmlCollection][i],
-              watJSONConstants.watDomJSON.options.fromWatJSON
-            ).children[0];
-          } else if (windowNative) {
-            result[i] = createElementNative('div');
-            result[i].innerHTML = obj[watJSONConstants.extTypeMap.htmlCollection][i];
-            result[i] = result[i].firstChild;
-            result[i].parentElement.removeChild(result[i]);
-          } else if (opt.extTypes.errorObject) {
-            result = {};
-            result[watJSONConstants.extTypeMap.errorObject] = _fromWatJSON(new Error('Could not get windows global object.', watJSONConstants.defOptions));
-          }
-        }
-      } else {
-        result = getIgnoredProp();
-      }
-    } else if (obj[watJSONConstants.extTypeMap.unknownObject]) {
-      return getIgnoredProp();
-    } else if (obj[watJSONConstants.extTypeMap.errorObject]) {
-      return commonUtils.clone(obj);
-    // Handle root prototype.
-    } else if (obj[watJSONConstants.extTypeMap.rootPrototype]) {
-      if (opt.extTypes.rootPrototype) {
-        result = objectPrototypeNative;
-      } else {
-        return getIgnoredProp();
-      }
-    } else {
-      // Handle object and prototype.
-      if (obj[watJSONConstants.extTypeMap.proto]) {
-        if (opt.extTypes.proto) {
-          result = new (function (): Function {
-            var object: Function = new Ctor();
-            objectPrototypeNative = _fromWatJSON(obj[watJSONConstants.extTypeMap.proto], opt);
-            return object;
-          }())();
-        } else {
-          result = new Ctor();
-        }
-      } else {
-        result = new Ctor();
-      }
-
-      const keyList: Array = getOwnPropertyNamesNative(obj);
-      keyList.forEach(function (key: string, idx: number) {
-        var unescapedKey: string = key;
-        var value: any;
-
-        if (! opt.extTypes.constructorFunc && key === watJSONConstants.extTypeMap.constructorFunc) {
-          value = getIgnoredProp();
-        } else if (key === watJSONConstants.extTypeMap.proto) {
-          value = getIgnoredProp();
-        } else {
-          value = _fromWatJSON(obj[key], opt);
-        }
-        if (!isIgnoredProp(value)) {
-          unescapedKey = watJSONConstants.unescKeynameMap[key] || key;
-          result[unescapedKey] = value;
-        }
-      }, this);
-    }
-  }
-
-  return result;
-}
-
+/**
+ * Javascript object reference manager for watJSON to support javascript objects which contains self/circular references.
+ * @static
+ * @ignore
+ */
+var objRefManager: WatObjectReferenceManager = new WatObjectReferenceManager();
 
 /**
  * the main function for `watJSON.toWatJSON(obj, opt)` and `watJson.stringify(obj, opt)`.
- * @param  {any} obj
- * @param  {watJSON.Options} opt
- * @param  {any=} prototype
+ * @param {any} obj
+ * @param {watJSON.Options} opt
+ * @param {any=} prototype
  * @return {any}
  * @static
  * @private
@@ -307,8 +148,8 @@ function _toWatJSON (obj: any, opt: Options, prototype: any): any {
         return getIgnoredProp();
       }
     } else if (!isFiniteNative(obj)) {
-      if (opt.extTypes.InfinityNative) {
-        extendedType = watJSONConstants.extTypeMap.InfinityNative;
+      if (opt.extTypes.infinity) {
+        extendedType = watJSONConstants.extTypeMap.infinity;
         result = true;
       } else {
         return getIgnoredProp();
@@ -321,13 +162,23 @@ function _toWatJSON (obj: any, opt: Options, prototype: any): any {
   } else if (obj === null) {
     result = null;
   } else if (obj instanceof Array) {
-    const length: number = obj.length;
-    result = new Array();
-    let value: any;
-    for (let i: number = 0; i < length; i++) {
-      value = _toWatJSON(obj[i], opt);
-      if (!isIgnoredProp(value)) {
-        result[result.length] = value;
+    result = new Ctor();
+    let value: any = objRefManager.getIdByObject(obj);
+
+    if (value) {
+      result[watJSONConstants.extTypeMap.objLink] = value;
+    } else {
+      const length: number = obj.length;
+      result[watJSONConstants.extTypeMap.array] = [];
+      result[watJSONConstants.extTypeMap.objectAlias] = objPathManager.generatePath();
+      objRefManager.registerObject(result[watJSONConstants.extTypeMap.objectAlias], result, obj);
+
+      let array: Array = result[watJSONConstants.extTypeMap.array];
+      for (let i: number = 0; i < length; i++) {
+        value = _toWatJSON(obj[i], opt);
+        if (!isIgnoredProp(value)) {
+          array[result.length] = value;
+        }
       }
     }
   // Handle built-in objects.
@@ -468,6 +319,183 @@ function _toWatJSON (obj: any, opt: Options, prototype: any): any {
     var tempResult = result;
     result = new Ctor();
     result[extendedType] = tempResult;
+  }
+
+  return result;
+}
+
+/**
+ * The main function for `watJSON.fromWatJSON(obj, opt)` and `watJson.parse(str, opt)`.
+ * @param {any} obj
+ * @param {watJSON.Options} opt
+ * @return {any}
+ * @static
+ * @private
+ * @ignore
+ */
+function _fromWatJSON (obj: any, opt: Options): any {
+  var result: any;
+  var dataType: string = typeof obj;
+
+  // Handle JSON standard types without object type.
+  if (dataType === 'string') {
+    result = obj;
+  } else if (dataType === 'number') {
+    result = obj;
+  } else if (dataType === 'boolean') {
+    result = obj;
+  } else if (obj === null) {
+    result = null;
+  } else if (obj instanceof Array) {
+    const length: number = obj.length;
+    result = new Array();
+    let value: any;
+    for (let i: number = 0; i < length; i++) {
+      value = _fromWatJSON(obj[i], opt);
+      if (!isIgnoredProp(value)) {
+        result[result.length] = value;
+      }
+    }
+  } else { // dataType === 'object'
+    if (obj[watJSONConstants.extTypeMap.nan]) {
+      if (opt.extTypes.nan) {
+        result = NaN;
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.infinity]) {
+      if (opt.extTypes.infinity) {
+        result = InfinityNative;
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.func]) {
+      if (opt.extTypes.func) {
+        if (opt.useFunctionAST) {
+          result = escodegen.generate(obj[watJSONConstants.extTypeMap.func].ast, watJSONConstants.functionAst.options);
+          result = result.substring('export default '.length);
+          result = evalNative(`[${result}][0]`);
+        } else {
+          result = evalNative(`[${obj[watJSONConstants.extTypeMap.func].str}][0]`);
+        }
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.nativeFunction]) {
+      if (opt.extTypes.nativeFunction) {
+        result = evalNative('[function () { console.warn("native function"); }][0]');
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.date]) {
+      if (opt.extTypes.date) {
+        // TODO : implement
+        result = evalNative(obj[watJSONConstants.extTypeMap.date]);
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.regexp]) {
+      if (opt.extTypes.regexp) {
+        result = evalNative(obj[watJSONConstants.extTypeMap.regexp]);
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.undef]) {
+      if (opt.extTypes.undef) {
+        result = undefinedNative;
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.htmlElement]) {
+      if (opt.extTypes.htmlElement) {
+        if (opt.useWatDomJSON) {
+          result = watDomJSON.toDOM(
+            obj[watJSONConstants.extTypeMap.htmlElement],
+            watJSONConstants.watDomJSON.options.fromWatJSON
+          ).children[0];
+        } else if (windowNative) {
+          result = createElementNative('div');
+          result.innerHTML = obj[watJSONConstants.extTypeMap.htmlElement];
+          result = result.firstChild;
+          result.parentElement.removeChild(result);
+        } else if (opt.extTypes.errorObject) {
+          result = new Ctor();
+          result[watJSONConstants.extTypeMap.errorObject] = _toWatJSON(new Error('Could not get window global object.'), watJSONConstants.defOptions);
+        } else {
+          result = getIgnoredProp();
+        }
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.htmlCollection]) {
+      if (opt.extTypes.htmlCollection) {
+        const length: number = obj[watJSONConstants.extTypeMap.htmlCollection].length;
+        result = new Array(length);
+
+        for (let i: number = 0; i < length; i++) {
+          if (opt.useWatDomJSON) {
+            result[i] = watDomJSON.toDOM(
+              obj[watJSONConstants.extTypeMap.htmlCollection][i],
+              watJSONConstants.watDomJSON.options.fromWatJSON
+            ).children[0];
+          } else if (windowNative) {
+            result[i] = createElementNative('div');
+            result[i].innerHTML = obj[watJSONConstants.extTypeMap.htmlCollection][i];
+            result[i] = result[i].firstChild;
+            result[i].parentElement.removeChild(result[i]);
+          } else if (opt.extTypes.errorObject) {
+            result = new Ctor();
+            result[watJSONConstants.extTypeMap.errorObject] = _fromWatJSON(new Error('Could not get windows global object.', watJSONConstants.defOptions));
+          }
+        }
+      } else {
+        result = getIgnoredProp();
+      }
+    } else if (obj[watJSONConstants.extTypeMap.unknownObject]) {
+      return getIgnoredProp();
+    } else if (obj[watJSONConstants.extTypeMap.errorObject]) {
+      return commonUtils.clone(obj);
+    // Handle root prototype.
+    } else if (obj[watJSONConstants.extTypeMap.rootPrototype]) {
+      if (opt.extTypes.rootPrototype) {
+        result = objectPrototypeNative;
+      } else {
+        return getIgnoredProp();
+      }
+    } else {
+      // Handle object and prototype.
+      if (obj[watJSONConstants.extTypeMap.proto]) {
+        if (opt.extTypes.proto) {
+          result = (function (): Object {
+            var ctor: Function = function () {};
+            ctor.prototype = _fromWatJSON(obj[watJSONConstants.extTypeMap.proto], opt);
+            return new ctor();
+          })();
+        } else {
+          result = new Ctor();
+        }
+      } else {
+        result = new Ctor();
+      }
+
+      const keyList: Array = getOwnPropertyNamesNative(obj);
+      keyList.forEach(function (key: string, idx: number) {
+        var unescapedKey: string = key;
+        var value: any;
+
+        if (! opt.extTypes.constructorFunc && key === watJSONConstants.extTypeMap.constructorFunc) {
+          value = getIgnoredProp();
+        } else if (key === watJSONConstants.extTypeMap.proto) {
+          value = getIgnoredProp();
+        } else {
+          value = _fromWatJSON(obj[key], opt);
+        }
+        if (!isIgnoredProp(value)) {
+          unescapedKey = watJSONConstants.unescKeynameMap[key] || key;
+          result[unescapedKey] = value;
+        }
+      }, this);
+    }
   }
 
   return result;
